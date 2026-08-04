@@ -1,22 +1,60 @@
 from database.db import db
-from datetime import datetime
+
 
 class Report(db.Model):
-
     __tablename__ = "reports"
 
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
 
-    disaster_type = db.Column(db.String(100), nullable=False)
+    user_id = db.Column(
+        db.Integer,
+        nullable=False
+    )
 
-    location = db.Column(db.String(255), nullable=False)
+    disaster_type = db.Column(
+        db.String(100),
+        nullable=False
+    )
 
-    description = db.Column(db.Text)
+    description = db.Column(
+        db.Text,
+        nullable=False
+    )
 
-    image_path = db.Column(db.String(255))
+    latitude = db.Column(
+        db.Float,
+        nullable=False
+    )
 
-    prediction = db.Column(db.String(100))
+    longitude = db.Column(
+        db.Float,
+        nullable=False
+    )
 
-    confidence = db.Column(db.Float)
+    image_path = db.Column(
+        db.String(255)
+    )
 
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    ai_prediction = db.Column(
+        db.String(100)
+    )
+
+    severity = db.Column(
+        db.String(20)
+    )
+
+    status = db.Column(
+        db.String(20),
+        default="Pending"
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        server_default=db.func.now()
+    )
+
+    def __repr__(self):
+        return f"<Report {self.id}>"

@@ -1,6 +1,7 @@
 from flask import Flask
 from config import Config
 from database.db import db
+from routes.auth import auth
 
 # Import Models
 from models.user import User
@@ -13,6 +14,9 @@ app.config.from_object(Config)
 
 # Connect SQLAlchemy to Flask
 db.init_app(app)
+
+# Register Routes
+app.register_blueprint(auth)
 
 # Create database tables
 with app.app_context():
