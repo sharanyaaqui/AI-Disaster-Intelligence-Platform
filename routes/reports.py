@@ -7,8 +7,16 @@ from services.report_service import (
     create_report,
     get_all_reports,
     get_report_by_id,
-    verify_report
+    verify_report,
+    total_reports,
+    pending_reports,
+    verified_reports,
+    rejected_reports,
+    get_reports_by_type,
+    get_reports_by_status,
+    get_recent_reports
 )
+
 
 reports = Blueprint("reports", __name__)
 
@@ -199,3 +207,94 @@ def upload_image():
         "message": "Image uploaded successfully",
         "filename": filename
     }), 201
+    # =====================================================
+# GET /dashboard
+# Dashboard Statistics
+# =====================================================
+@reports.route("/dashboard", methods=["GET"])
+def dashboard():
+
+    return jsonify({
+        "success": True,
+        "statistics": {
+            "total_reports": total_reports(),
+            "pending_reports": pending_reports(),
+            "verified_reports": verified_reports(),
+            "rejected_reports": rejected_reports()
+        }
+    }), 200
+    # =====================================================
+# GET /reports/type/<disaster_type>
+# Filter Reports by Disaster Type
+# =====================================================
+@reports.route("/reports/type/<string:disaster_type>", methods=["GET"])
+def reports_by_type(disaster_type):
+
+    reports_list = get_reports_by_type(disaster_type)
+
+    data = []
+
+    for report in reports_list:
+        data.append({
+            "id": report.id,
+            "disaster_type": report.disaster_type,
+            "description": report.description,
+            "status": report.status,
+            "reported_by": report.user.full_name,
+            "created_at": report.created_at
+        })
+
+    return jsonify({
+        "success": True,
+        "total_reports": len(data),
+        "reports": data
+    }), 200
+    # =====================================================
+# GET /reports/status/<status>
+# =====================================================
+@reports.route("/reports/status/<string:status>", methods=["GET"])
+def reports_by_status(status):
+
+    reports_list = get_reports_by_status(status)
+
+    data = []
+
+    for report in reports_list:
+        data.append({
+            "id": report.id,
+            "disaster_type": report.disaster_type,
+            "description": report.description,
+            "status": report.status,
+            "reported_by": report.user.full_name,
+            "created_at": report.created_at
+        })
+
+    return jsonify({
+        "success": True,
+        "total_reports": len(data),
+        "reports": data
+    }), 200
+    # =====================================================
+# GET /reports/recent
+# =====================================================
+@reports.route("/reports/recent", methods=["GET"])
+def recent_reports():
+
+    reports_list = get_recent_reports()
+
+    data = []
+
+    for report in reports_list:
+        data.append({
+            "id": report.id,
+            "disaster_type": report.disaster_type,
+            "description": report.description,
+            "status": report.status,
+            "reported_by": report.user.full_name,
+            "created_at": report.created_at
+        })
+
+    return jsonify({
+        "success": True,
+        "reports": data
+    }), 200

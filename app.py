@@ -7,11 +7,13 @@ from database.db import db
 # Import Models
 from models.user import User
 from models.report import Report
+from models.alert import Alert
 
 # Import Routes
 from routes.auth import auth
 from routes.reports import reports
-
+from routes.alerts import alerts
+from routes.chatbot import chatbot
 # Create Flask app
 app = Flask(__name__)
 
@@ -27,6 +29,8 @@ db.init_app(app)
 # Register Blueprints
 app.register_blueprint(auth)
 app.register_blueprint(reports)
+app.register_blueprint(alerts)
+app.register_blueprint(chatbot)
 
 # Create database tables
 with app.app_context():
