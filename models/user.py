@@ -2,6 +2,11 @@ from database.db import db
 
 
 class User(db.Model):
+    reports = db.relationship(
+    "Report",
+    backref="user",
+    lazy=True
+)
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True)

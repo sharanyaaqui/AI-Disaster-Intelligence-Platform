@@ -1,16 +1,15 @@
 from database.db import db
+from datetime import datetime
 
 
 class Report(db.Model):
     __tablename__ = "reports"
 
-    id = db.Column(
-        db.Integer,
-        primary_key=True
-    )
+    id = db.Column(db.Integer, primary_key=True)
 
     user_id = db.Column(
         db.Integer,
+        db.ForeignKey("users.id"),
         nullable=False
     )
 
@@ -34,16 +33,9 @@ class Report(db.Model):
         nullable=False
     )
 
-    image_path = db.Column(
-        db.String(255)
-    )
-
-    ai_prediction = db.Column(
-        db.String(100)
-    )
-
-    severity = db.Column(
-        db.String(20)
+    image = db.Column(
+        db.String(255),
+        nullable=True
     )
 
     status = db.Column(
@@ -53,8 +45,5 @@ class Report(db.Model):
 
     created_at = db.Column(
         db.DateTime,
-        server_default=db.func.now()
+        default=datetime.utcnow
     )
-
-    def __repr__(self):
-        return f"<Report {self.id}>"
