@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Profile | DIVYA AI</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <link rel="stylesheet" href="../static/css/style.css">
+
+</head>
+
+<body>
+
+<div class="d-flex">
+
+    <!-- Sidebar -->
+
+    <div class="sidebar">
+
+        <div class="text-center py-4">
+
+            <img src="../static/images/divya-logo.png"
+                 class="sidebar-logo"
+                 alt="DIVYA AI">
+
+            <h4 class="text-white mt-3">
+                DIVYA <span class="text-warning">AI</span>
+            </h4>
+
+        </div>
+
+        <ul class="nav flex-column">
+
+            <li><a href="dashboard.html"><i class="bi bi-grid-fill"></i> Dashboard</a></li>
+
+            <li><a href="report.html"><i class="bi bi-exclamation-triangle-fill"></i> Report Incident</a></li>
+
+            <li><a href="chatbot.html"><i class="bi bi-robot"></i> Ask DIVYA</a></li>
+
+            <li><a href="recommendation.html"><i class="bi bi-shield-check"></i> Safety Guidance</a></li>
+
+            <li><a href="profile.html" class="active"><i class="bi bi-person-circle"></i> Profile</a></li>
+
+        </ul>
+
+    </div>
+
+    <!-- Main Content -->
+
+    <div class="main-content">
+
+        <!-- Top Navbar -->
+
+        <nav class="dashboard-nav">
+
+            <h3>My Profile</h3>
+
+            <button class="btn btn-warning">
+                <i class="bi bi-pencil-square"></i>
+                Edit Profile
+            </button>
+
+        </nav>
+
+        <div class="container-fluid mt-4">
+
+            <div class="row">
+
+                <!-- Left Card -->
+
+                <div class="col-lg-4">
+
+                    <div class="dashboard-card text-center">
+
+                        <img src="../static/images/divya-logo.png"
+                             class="profile-avatar mb-3"
+                             alt="Profile">
+
+                        <h3>Sharanya Pandey</h3>
+
+                        <p class="text-muted">
+                            Registered Citizen
+                        </p>
+
+                        <hr>
+
+                        <div class="text-start">
+
+                            <p><i class="bi bi-envelope-fill text-warning"></i> sharanya@email.com</p>
+
+                            <p><i class="bi bi-telephone-fill text-warning"></i> +91 XXXXX XXXXX</p>
+
+                            <p><i class="bi bi-geo-alt-fill text-warning"></i> Lucknow, Uttar Pradesh</p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Right Card -->
+
+                <div class="col-lg-8">
+
+                    <div class="dashboard-card">
+
+                        <h4 class="mb-4">Personal Information</h4>
+
+                        <form>
+
+                            <div class="row">
+
+                                <div class="col-md-6 mb-3">
+
+                                    <label>First Name</label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           value="Sharanya">
+
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+
+                                    <label>Last Name</label>
+
+                                    <input type="text"
+                                           class="form-control"
+                                           value="Pandey">
+
+                                </div>
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>Email</label>
+
+                                <input type="email"
+                                       class="form-control"
+                                       value="sharanya@email.com">
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>Phone Number</label>
+
+                                <input type="text"
+                                       class="form-control"
+                                       value="+91 XXXXX XXXXX">
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>Preferred Language</label>
+
+                                <select class="form-select">
+
+                                    <option>English</option>
+
+                                    <option>हिन्दी</option>
+
+                                </select>
+
+                            </div>
+
+                            <div class="mb-3">
+
+                                <label>Home Address</label>
+
+                                <textarea
+                                    class="form-control"
+                                    rows="3"
+                                    placeholder="Enter Address"></textarea>
+
+                            </div>
+
+                            <button class="btn btn-warning">
+
+                                <i class="bi bi-save"></i>
+
+                                Save Changes
+
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Emergency Contacts -->
+
+            <div class="dashboard-card mt-4">
+
+                <h4 class="mb-4">
+
+                    <i class="bi bi-person-lines-fill"></i>
+
+                    Emergency Contacts
+
+                </h4>
+
+                <div class="row">
+
+                    <div class="col-md-6">
+
+                        <input
+                            class="form-control mb-3"
+                            placeholder="Contact Name">
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <input
+                            class="form-control mb-3"
+                            placeholder="Phone Number">
+
+                    </div>
+
+                </div>
+
+                <button class="btn btn-success">
+
+                    <i class="bi bi-plus-circle"></i>
+
+                    Add Contact
+
+                </button>
+
+            </div>
+
+            <!-- Vulnerability Profile -->
+
+            <div class="dashboard-card mt-4 mb-5">
+
+                <h4 class="mb-4">
+
+                    <i class="bi bi-heart-pulse"></i>
+
+                    Vulnerability Profile
+
+                </h4>
+
+                <div class="row">
+
+                    <div class="col-md-3">
+
+                        <div class="form-check">
+
+                            <input class="form-check-input" type="checkbox">
+
+                            <label class="form-check-label">
+
+                                Elderly
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <div class="form-check">
+
+                            <input class="form-check-input" type="checkbox">
+
+                            <label class="form-check-label">
+
+                                Child
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <div class="form-check">
+
+                            <input class="form-check-input" type="checkbox">
+
+                            <label class="form-check-label">
+
+                                Disability
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-3">
+
+                        <div class="form-check">
+
+                            <input class="form-check-input" type="checkbox">
+
+                            <label class="form-check-label">
+
+                                Chronic Illness
+
+                            </label>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="../static/js/script.js"></script>
+
+</body>
+
+</html>
