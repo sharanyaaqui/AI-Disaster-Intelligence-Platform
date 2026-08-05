@@ -1,6 +1,7 @@
-from flask import Flask
+from flask import Flask, send_from_directory
 import os
 from flask_cors import CORS
+
 from config import Config
 from database.db import db
 
@@ -14,9 +15,11 @@ from routes.auth import auth
 from routes.reports import reports
 from routes.alerts import alerts
 from routes.chatbot import chatbot
+
 # Create Flask app
 app = Flask(__name__)
 CORS(app)
+
 # Load configuration
 app.config.from_object(Config)
 
@@ -43,7 +46,15 @@ def home():
         "status": "Backend Running",
         "project": "AI Disaster Intelligence Platform"
     }
-print(app.url_map)
+
+# Serve uploaded images
+@app.route("/uploads/<filename>")
+def uploaded_file(filename):
+    return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
+
+# Print all routes (optional, for debugging)
+
+
 # Run the application
 if __name__ == "__main__":
     app.run(debug=True)

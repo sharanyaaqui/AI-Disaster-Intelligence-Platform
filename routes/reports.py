@@ -177,7 +177,7 @@ def verify_disaster_report(report_id):
 @reports.route("/report/image", methods=["POST"])
 def upload_image():
 
-    print(request.files)
+    
 
     if "image" not in request.files:
         return jsonify({
