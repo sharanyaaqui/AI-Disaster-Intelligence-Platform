@@ -1,6 +1,6 @@
 from flask import Flask
 import os
-
+from flask_cors import CORS
 from config import Config
 from database.db import db
 
@@ -16,7 +16,7 @@ from routes.alerts import alerts
 from routes.chatbot import chatbot
 # Create Flask app
 app = Flask(__name__)
-
+CORS(app)
 # Load configuration
 app.config.from_object(Config)
 
