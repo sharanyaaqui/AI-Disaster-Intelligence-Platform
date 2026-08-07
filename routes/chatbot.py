@@ -1,33 +1,59 @@
 from flask import Blueprint, request, jsonify
+from werkzeug.utils import secure_filename
+import os
+
+from ai_model.predict import predict_disaster
 
 chatbot = Blueprint("chatbot", __name__)
 
+UPLOAD_FOLDER = "uploads"
+
 
 @chatbot.route("/predict", methods=["POST"])
-def predict_disaster():
+def predict():
 
-    data = request.get_json()
+    print("========== PREDICT API CALLED ==========")
 
-    description = data.get("description", "")
+    # Check image exists
+    if "image" not in request.files:
+        print("ERROR: No image in request")
+        return jsonify({
+            "success": False,
+            "message": "No image uploaded"
+        }), 400
 
-    description = description.lower()
+    image = request.files["image"]
 
-    if "flood" in description:
-        prediction = "Flood"
+    print("Image received:", image.filename)
 
-    elif "fire" in description:
-        prediction = "Fire"
+    # Check filename
+    if image.filename == "":
+        print("ERROR: Empty filename")
+        return jsonify({
+            "success": False,
+            "message": "No file selected"
+        }), 400
 
-    elif "earthquake" in description:
-        prediction = "Earthquake"
+    # Create upload folder
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-    elif "landslide" in description:
-        prediction = "Landslide"
+    filename = secure_filename(image.filename)
+    filepath = os.path.join(UPLOAD_FOLDER, filename)
 
-    else:
-        prediction = "Unknown"
+    # Save image
+    image.save(filepath)
+
+    print("IMAGE SAVED:", filepath)
+
+    # Run AI prediction
+    print("STARTING AI PREDICTION...")
+
+    result = predict_disaster(filepath)
+
+    print("PREDICTION DONE:")
+    print(result)
 
     return jsonify({
         "success": True,
-        "prediction": prediction
+        "result": result
     }), 200
