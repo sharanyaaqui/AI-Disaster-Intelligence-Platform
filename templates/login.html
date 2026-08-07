@@ -20,7 +20,8 @@
         rel="stylesheet">
 
     <!-- CSS -->
-    <link rel="stylesheet" href="../static/css/style.css">
+    <link rel="stylesheet"
+href="{{ url_for('static', filename='css/style.css') }}">
 
 </head>
 
@@ -40,7 +41,7 @@
 
 <div class="col-md-6 login-left">
 
-<img src="../static/images/divya-logo.png"
+<img src="{{ url_for('static', filename='images/divya-logo.png') }}"
 class="login-logo"
 alt="DIVYA AI">
 
@@ -103,7 +104,7 @@ Login to continue to DIVYA AI
 
 </p>
 
-<form>
+<form action="/login" method="POST">
 
 <div class="mb-3">
 
@@ -111,8 +112,10 @@ Login to continue to DIVYA AI
 
 <input
 type="email"
+name="email"
 class="form-control"
-placeholder="Enter your email">
+placeholder="Enter your email"
+required>
 
 </div>
 
@@ -122,8 +125,10 @@ placeholder="Enter your email">
 
 <input
 type="password"
+name="password"
 class="form-control"
-placeholder="Enter password">
+placeholder="Enter password"
+required>
 
 </div>
 
@@ -147,6 +152,7 @@ Forgot Password?
 </div>
 
 <button
+type="submit"
 class="btn btn-warning w-100 py-2">
 
 <i class="bi bi-box-arrow-in-right"></i>
@@ -159,7 +165,7 @@ Login
 
 Don't have an account?
 
-<a href="register.html">
+<a href="{{ url_for('register') }}">
 
 Create Account
 
@@ -181,7 +187,7 @@ Create Account
 
 </div>
 
-<script src="../static/js/script.js"></script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
 
 </body>
 
