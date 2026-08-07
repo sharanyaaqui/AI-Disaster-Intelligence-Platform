@@ -2,9 +2,10 @@ import tensorflow as tf
 import numpy as np
 from tensorflow.keras.preprocessing import image
 
-from config import *
-from config import MODEL_PATH, IMAGE_SIZE, CLASS_NAMES
-from recommendations import recommendations
+
+from ai_model.config import MODEL_PATH, IMAGE_SIZE, CLASS_NAMES
+from ai_model.recommendations import recommendations
+
 
 # Load model only once
 model = tf.keras.models.load_model(MODEL_PATH)
