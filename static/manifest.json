@@ -1,0 +1,22 @@
+{
+    "name": "DIVYA AI - Disaster Intelligence Vigilance and Assistance",
+    "short_name": "DIVYA AI",
+    "description": "Emergency preparedness and disaster assistance system",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0B1F3A",
+    "theme_color": "#0B1F3A",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/static/images/divya-logo.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/static/images/divya-logo.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

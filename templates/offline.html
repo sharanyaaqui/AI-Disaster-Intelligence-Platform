@@ -8,457 +8,835 @@
 
     <title>Offline Resources | DIVYA AI</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
 
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Bootstrap Icons -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    >
 
-    <link rel="stylesheet"
-href="{{ url_for('static', filename='css/style.css') }}">
+   <link
+        href="https://unpkg.com/maplibre-gl@5.9.0/dist/maplibre-gl.css"
+        rel="stylesheet"
+    />
+
+    <!-- DIVYA CSS -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}"
+    >
+
+    <style>
+
+        /* ==============================
+           MAP
+        ============================== */
+
+        #offlineMap {
+            width: 100%;
+            height: 500px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #e9ecef;
+        }
+
+        #emergencyFacilities {
+            max-height: 350px;
+            overflow-y: auto;
+        }
+
+        .facility-button {
+            min-height: 75px;
+        }
+
+        .map-status {
+            font-size: 14px;
+        }
+
+        /* ==============================
+           MOBILE
+        ============================== */
+
+        @media (max-width: 768px) {
+
+            #offlineMap {
+                height: 350px;
+            }
+
+            .dashboard-nav {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 15px;
+            }
+
+        }
+
+    </style>
 
 </head>
+
 
 <body>
 
 <div class="d-flex">
 
-<!-- Sidebar -->
 
-<div class="sidebar">
+    <!-- ==========================================
+         SIDEBAR
+    =========================================== -->
 
-<div class="text-center py-4">
+    <div class="sidebar">
 
-<img src="{{ url_for('static', filename='images/divya-logo.png') }}"
-class="sidebar-logo">
+        <div class="text-center py-4">
 
-<h4 class="text-white mt-3">
+            <img
+                src="{{ url_for('static', filename='images/divya-logo.png') }}"
+                class="sidebar-logo"
+                alt="DIVYA AI Logo"
+            >
 
-DIVYA <span class="text-warning">AI</span>
+            <h4 class="text-white mt-3">
+                DIVYA <span class="text-warning">AI</span>
+            </h4>
 
-</h4>
+        </div>
 
-</div>
 
-<ul class="nav flex-column">
+        <ul class="nav flex-column">
 
-<li>
+            <li>
+                <a href="{{ url_for('dashboard') }}">
+                    <i class="bi bi-grid-fill"></i>
+                    Dashboard
+                </a>
+            </li>
 
-<a href="{{ url_for('dashboard') }}">
 
-<i class="bi bi-grid-fill"></i>
+            <li>
+                <a href="{{ url_for('report_page') }}">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    Report Incident
+                </a>
+            </li>
 
-Dashboard
 
-</a>
+            <li>
+                <a href="{{ url_for('chatbot_page') }}">
+                    <i class="bi bi-robot"></i>
+                    Ask DIVYA
+                </a>
+            </li>
 
-</li>
 
-<li>
+            <li>
+                <a href="{{ url_for('recommendation') }}">
+                    <i class="bi bi-shield-check"></i>
+                    Safety Guidance
+                </a>
+            </li>
 
-<a href="{{ url_for('report') }}">
 
-<i class="bi bi-exclamation-triangle-fill"></i>
+            <li>
+                <a href="{{ url_for('offline') }}" class="active">
+                    <i class="bi bi-wifi-off"></i>
+                    Offline Resources
+                </a>
+            </li>
 
-Report Incident
 
-</a>
+            <li>
+                <a href="{{ url_for('profile') }}">
+                    <i class="bi bi-person-circle"></i>
+                    Profile
+                </a>
+            </li>
 
-</li>
+        </ul>
 
-<li>
+    </div>
 
-<a href="{{ url_for('chatbot') }}">
 
-<i class="bi bi-robot"></i>
 
-Ask DIVYA
+    <!-- ==========================================
+         MAIN CONTENT
+    =========================================== -->
 
-</a>
+    <div class="main-content">
 
-</li>
 
-<li>
+        <!-- NAVBAR -->
 
-<a href="{{ url_for('recommendation') }}">
+        <nav class="dashboard-nav">
 
-<i class="bi bi-shield-check"></i>
+    <div class="d-flex align-items-center gap-3">
 
-Safety Guidance
+        <h3 class="mb-0">
+            Offline Emergency Resources
+        </h3>
 
-</a>
+        <span
+            id="networkStatus"
+            class="badge bg-success"
+        >
+            <i class="bi bi-wifi"></i>
+            Online
+        </span>
 
-</li>
+    </div>
 
-<li>
 
-<a href="{{ url_for('offline') }}" class="active">
+    <button
+        type="button"
+        class="btn btn-warning"
+        id="downloadOfflineKit"
+    >
 
-<i class="bi bi-wifi-off"></i>
+        <i class="bi bi-download"></i>
 
-Offline Resources
+        Download Offline Kit
 
-</a>
-
-</li>
-
-<li>
-
-<a href="{{ url_for('profile') }}">
-
-<i class="bi bi-person-circle"></i>
-
-Profile
-
-</a>
-
-</li>
-
-</ul>
-
-</div>
-
-<!-- Main -->
-
-<div class="main-content">
-
-<nav class="dashboard-nav">
-
-<h3>
-
-Offline Emergency Resources
-
-</h3>
-
-<button 
-type="button"
-class="btn btn-warning">
-
-<i class="bi bi-download"></i>
-
-Download Offline Kit
-
-</button>
+    </button>
 
 </nav>
 
-<div class="container-fluid mt-4">
 
-<!-- Hero -->
 
-<div class="dashboard-card offline-banner">
+        <div class="container-fluid mt-4">
 
-<div>
 
-<h2>
+            <!-- ==========================================
+                 HERO
+            =========================================== -->
 
-Stay Prepared Even Without Internet
+            <div class="dashboard-card offline-banner">
 
-</h2>
+                <div>
 
-<p>
+                    <h2>
+                        Stay Prepared Even Without Internet
+                    </h2>
 
-DIVYA AI stores essential disaster information locally so that
-critical guidance, emergency contacts and preparedness resources
-remain available during network outages.
+                    <p>
+                        DIVYA AI stores essential disaster information
+                        locally so that critical guidance, emergency
+                        contacts and preparedness resources remain
+                        available during network outages.
+                    </p>
 
-</p>
+                </div>
 
-</div>
 
-<div>
+                <div>
 
-<i class="bi bi-wifi-off offline-banner-icon"></i>
+                    <i class="bi bi-wifi-off offline-banner-icon"></i>
 
-</div>
-
-</div>
-
-<!-- Resource Cards -->
-
-<div class="row mt-4">
-
-<div class="col-lg-3">
-
-<div class="dashboard-card offline-resource">
-
-<i class="bi bi-book-half"></i>
-
-<h5>
-
-Emergency Handbook
-
-</h5>
-
-<p>
-
-Flood, cyclone, earthquake and fire survival guides.
-
-</p>
-
-<button 
-type="button"
-class="btn btn-outline-warning">
-
-Open Guide
-
-</button>
-
-</div>
-
-</div>
-
-<div class="col-lg-3">
-
-<div class="dashboard-card offline-resource">
-
-<i class="bi bi-map"></i>
-
-<h5>
-
-Offline Maps
-
-</h5>
-
-<p>
-
-Downloaded shelter maps and evacuation routes.
-
-</p>
-
-<button 
-type="button"
-class="btn btn-outline-warning">
-
-View Maps
-
-</button>
-
-</div>
-
-</div>
-
-<div class="col-lg-3">
-
-<div class="dashboard-card offline-resource">
-
-<i class="bi bi-telephone-fill"></i>
-
-<h5>
-
-Emergency Contacts
-
-</h5>
-
-<p>
-
-Important emergency numbers stored locally.
-
-</p>
-
-<button 
-type="button"
-class="btn btn-outline-warning">
-
-View Contacts
-
-</button>
-
-</div>
-
-</div>
-
-<div class="col-lg-3">
-
-<div class="dashboard-card offline-resource">
-
-<i class="bi bi-box2-heart-fill"></i>
-
-<h5>
-
-Medical Kit
-
-</h5>
-
-<p>
-
-Essential medicines and first-aid checklist.
-
-</p>
-
-<button
-type="button"
-class="btn btn-outline-warning">
-
-Open List
-
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-<!-- Preparedness Checklist -->
-
-<div class="dashboard-card mt-4">
-
-<h4>
-
-Emergency Preparedness Checklist
-
-</h4>
-
-<div class="row mt-4">
-
-<div class="col-md-3">
-
-<div class="offline-check">
-
-<i class="bi bi-check-circle-fill"></i>
-
-Water Supply
-
-</div>
-
-</div>
-
-<div class="col-md-3">
-
-<div class="offline-check">
-
-<i class="bi bi-check-circle-fill"></i>
-
-Dry Food
-
-</div>
-
-</div>
-
-<div class="col-md-3">
-
-<div class="offline-check">
-
-<i class="bi bi-check-circle-fill"></i>
-
-Torch & Batteries
-
-</div>
-
-</div>
-
-<div class="col-md-3">
-
-<div class="offline-check">
-
-<i class="bi bi-check-circle-fill"></i>
-
-First Aid Kit
-
-</div>
-
-</div>
-
-<div class="col-md-3 mt-3">
-
-<div class="offline-check">
-
-<i class="bi bi-check-circle-fill"></i>
-
-Power Bank
-
-</div>
-
-</div>
-
-<div class="col-md-3 mt-3">
-
-<div class="offline-check">
-
-<i class="bi bi-check-circle-fill"></i>
-
-Medicines
-
-</div>
-
-</div>
-
-<div class="col-md-3 mt-3">
-
-<div class="offline-check">
-
-<i class="bi bi-check-circle-fill"></i>
-
-Important Documents
-
-</div>
-
-</div>
-
-<div class="col-md-3 mt-3">
-
-<div class="offline-check">
-
-<i class="bi bi-check-circle-fill"></i>
-
-Emergency Radio
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-<!-- Emergency Helplines -->
-
-<div class="dashboard-card mt-4">
-
-    <h4>
-
-        Emergency Helplines
-
-    </h4>
-
-    <div class="row mt-4">
-
-        <div class="col-lg-4">
-
-            <div class="offline-contact-card">
-
-                <i class="bi bi-shield-fill-check"></i>
-
-                <h5>Police</h5>
-
-                <h2>112</h2>
+                </div>
 
             </div>
 
-        </div>
 
-        <div class="col-lg-4">
 
-            <div class="offline-contact-card">
+            <!-- ==========================================
+                 RESOURCE CARDS
+            =========================================== -->
 
-                <i class="bi bi-fire"></i>
+            <div class="row mt-4">
 
-                <h5>Fire Brigade</h5>
 
-                <h2>101</h2>
+                <!-- HANDBOOK -->
+
+                <div class="col-lg-3 col-md-6 mb-4">
+
+                    <div class="dashboard-card offline-resource">
+
+                        <i class="bi bi-book-half"></i>
+
+                        <h5>
+                            Emergency Handbook
+                        </h5>
+
+                        <p>
+                            Flood, cyclone, earthquake and fire
+                            safety guidance.
+                        </p>
+
+                        <button
+                            type="button"
+                            class="btn btn-outline-warning"
+                            id="openGuide"
+                        >
+                            Open Guide
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- MAP -->
+
+                <div class="col-lg-3 col-md-6 mb-4">
+
+                    <div class="dashboard-card offline-resource">
+
+                        <i class="bi bi-map"></i>
+
+                        <h5>
+                            Emergency Map
+                        </h5>
+
+                        <p>
+                            Find your current location and nearby
+                            emergency facilities.
+                        </p>
+
+                        <button
+                            type="button"
+                            class="btn btn-outline-warning"
+                            id="viewMaps"
+                        >
+                            <i class="bi bi-geo-alt-fill"></i>
+                            Find My Location
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- CONTACTS -->
+
+                <div class="col-lg-3 col-md-6 mb-4">
+
+                    <div class="dashboard-card offline-resource">
+
+                        <i class="bi bi-telephone-fill"></i>
+
+                        <h5>
+                            Emergency Contacts
+                        </h5>
+
+                        <p>
+                            Important emergency numbers stored locally.
+                        </p>
+
+                        <button
+                            type="button"
+                            class="btn btn-outline-warning"
+                            id="viewContacts"
+                        >
+                            View Contacts
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- MEDICAL KIT -->
+
+                <div class="col-lg-3 col-md-6 mb-4">
+
+                    <div class="dashboard-card offline-resource">
+
+                        <i class="bi bi-box2-heart-fill"></i>
+
+                        <h5>
+                            Medical Kit
+                        </h5>
+
+                        <p>
+                            Essential first-aid and emergency supplies.
+                        </p>
+
+                        <button
+                            type="button"
+                            class="btn btn-outline-warning"
+                            id="openMedicalKit"
+                        >
+                            Open List
+                        </button>
+
+                    </div>
+
+                </div>
 
             </div>
 
-        </div>
 
-        <div class="col-lg-4">
 
-            <div class="offline-contact-card">
+            <!-- ==========================================
+                 EMERGENCY MAP
+            =========================================== -->
 
-                <i class="bi bi-heart-pulse-fill"></i>
+            <div class="dashboard-card mt-4">
 
-                <h5>Ambulance</h5>
+                <div class="d-flex justify-content-between align-items-center mb-3">
 
-                <h2>108</h2>
+                    <div>
+
+                        <h4 class="mb-1">
+                            🗺️ Emergency Map
+                        </h4>
+
+                        <p class="mb-0 text-muted">
+                            Find your current location and nearby
+                            emergency facilities.
+                        </p>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="btn btn-warning"
+                        id="locateMe"
+                    >
+                        <i class="bi bi-crosshair"></i>
+                        Locate Me
+                    </button>
+
+                </div>
+
+
+                <div id="offlineMap"></div>
+
+
+                <div
+                    id="emergencyFacilities"
+                    class="mt-3"
+                ></div>
+
+
+                <div
+                    id="mapStatus"
+                    class="map-status text-muted mt-2"
+                >
+                    Waiting for your location...
+                </div>
+
+            </div>
+
+
+
+            <!-- ==========================================
+                 PREPAREDNESS CHECKLIST
+            =========================================== -->
+
+            <div class="dashboard-card mt-4">
+
+                <h4>
+                    Emergency Preparedness Checklist
+                </h4>
+
+
+                <div class="row mt-4">
+
+
+                    <div class="col-md-3 mb-3">
+                        <div class="offline-check">
+                            <i class="bi bi-check-circle-fill"></i>
+                            Water Supply
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-3 mb-3">
+                        <div class="offline-check">
+                            <i class="bi bi-check-circle-fill"></i>
+                            Dry Food
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-3 mb-3">
+                        <div class="offline-check">
+                            <i class="bi bi-check-circle-fill"></i>
+                            Torch & Batteries
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-3 mb-3">
+                        <div class="offline-check">
+                            <i class="bi bi-check-circle-fill"></i>
+                            First Aid Kit
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-3 mb-3">
+                        <div class="offline-check">
+                            <i class="bi bi-check-circle-fill"></i>
+                            Power Bank
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-3 mb-3">
+                        <div class="offline-check">
+                            <i class="bi bi-check-circle-fill"></i>
+                            Medicines
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-3 mb-3">
+                        <div class="offline-check">
+                            <i class="bi bi-check-circle-fill"></i>
+                            Important Documents
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-3 mb-3">
+                        <div class="offline-check">
+                            <i class="bi bi-check-circle-fill"></i>
+                            Emergency Radio
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ==========================================
+                 EMERGENCY HELPLINES
+            =========================================== -->
+
+            <div class="dashboard-card mt-4">
+
+                <h4>
+                    Emergency Helplines
+                </h4>
+
+
+                <div class="row mt-4">
+
+
+                    <div class="col-lg-4 mb-3">
+
+                        <div class="offline-contact-card">
+
+                            <i class="bi bi-shield-fill-check"></i>
+
+                            <h5>
+                                Emergency
+                            </h5>
+
+                            <h2>
+                                112
+                            </h2>
+
+                            <a
+                                href="tel:112"
+                                class="btn btn-outline-warning"
+                            >
+                                Call 112
+                            </a>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-lg-4 mb-3">
+
+                        <div class="offline-contact-card">
+
+                            <i class="bi bi-fire"></i>
+
+                            <h5>
+                                Fire Brigade
+                            </h5>
+
+                            <h2>
+                                101
+                            </h2>
+
+                            <a
+                                href="tel:101"
+                                class="btn btn-outline-warning"
+                            >
+                                Call 101
+                            </a>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-lg-4 mb-3">
+
+                        <div class="offline-contact-card">
+
+                            <i class="bi bi-heart-pulse-fill"></i>
+
+                            <h5>
+                                Ambulance
+                            </h5>
+
+                            <h2>
+                                108
+                            </h2>
+
+                            <a
+                                href="tel:108"
+                                class="btn btn-outline-warning"
+                            >
+                                Call 108
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ==========================================
+                 DISASTER GUIDES
+            =========================================== -->
+
+            <div class="dashboard-card mt-4">
+
+                <h4>
+                    Offline Disaster Guides
+                </h4>
+
+
+                <div class="row mt-4">
+
+
+                    <div class="col-lg-4 mb-4">
+
+                        <div class="offline-guide">
+
+                            🌊
+
+                            <h5 class="mt-3">
+                                Flood
+                            </h5>
+
+                            <p>
+                                Move to safer or higher ground.
+                                Avoid entering moving floodwater.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-lg-4 mb-4">
+
+                        <div class="offline-guide">
+
+                            🌍
+
+                            <h5 class="mt-3">
+                                Earthquake
+                            </h5>
+
+                            <p>
+                                Drop, Cover and Hold.
+                                Stay away from windows and elevators.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-lg-4 mb-4">
+
+                        <div class="offline-guide">
+
+                            🔥
+
+                            <h5 class="mt-3">
+                                Fire
+                            </h5>
+
+                            <p>
+                                Leave using stairs where possible.
+                                Stay low if smoke is present.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-lg-4 mb-4">
+
+                        <div class="offline-guide">
+
+                            🌪️
+
+                            <h5 class="mt-3">
+                                Cyclone
+                            </h5>
+
+                            <p>
+                                Stay indoors and follow official
+                                evacuation instructions.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-lg-4 mb-4">
+
+                        <div class="offline-guide">
+
+                            ⚡
+
+                            <h5 class="mt-3">
+                                Lightning
+                            </h5>
+
+                            <p>
+                                Move indoors and avoid open areas,
+                                isolated trees and water.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-lg-4 mb-4">
+
+                        <div class="offline-guide">
+
+                            🌡️
+
+                            <h5 class="mt-3">
+                                Heatwave
+                            </h5>
+
+                            <p>
+                                Drink water regularly and avoid
+                                prolonged exposure to extreme heat.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ==========================================
+                 DOWNLOADS
+            =========================================== -->
+
+            <div class="dashboard-card mt-4">
+
+                <h4>
+                    Downloadable Resources
+                </h4>
+
+
+                <div class="row mt-4">
+
+
+                    <div class="col-md-4 mb-3">
+
+                        <button
+                            type="button"
+                            class="btn btn-warning w-100"
+                            id="downloadHandbook"
+                        >
+                            <i class="bi bi-file-earmark-text-fill"></i>
+                            Disaster Handbook
+                        </button>
+
+                    </div>
+
+
+                    <div class="col-md-4 mb-3">
+
+                        <button
+                            type="button"
+                            class="btn btn-warning w-100"
+                            id="downloadMaps"
+                        >
+                            <i class="bi bi-map-fill"></i>
+                            Map Information
+                        </button>
+
+                    </div>
+
+
+                    <div class="col-md-4 mb-3">
+
+                        <button
+                            type="button"
+                            class="btn btn-warning w-100"
+                            id="downloadEmergencyKit"
+                        >
+                            <i class="bi bi-download"></i>
+                            Emergency Kit
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- ==========================================
+                 INFORMATION
+            =========================================== -->
+
+            <div class="dashboard-card mt-4 mb-5">
+
+                <div class="d-flex align-items-center">
+
+                    <i class="bi bi-info-circle-fill text-warning fs-1 me-4"></i>
+
+                    <div>
+
+                        <h4>
+                            Offline Mode
+                        </h4>
+
+                        <p class="mb-0">
+
+                            DIVYA AI keeps emergency guidance,
+                            disaster safety instructions and
+                            emergency numbers available locally.
+                            Map tiles and nearby facility searches
+                            require an internet connection unless
+                            locally cached map data is implemented.
+
+                        </p>
+
+                    </div>
+
+                </div>
 
             </div>
 
@@ -468,258 +846,2182 @@ Emergency Radio
 
 </div>
 
-<!-- Disaster Guides -->
 
-<div class="dashboard-card mt-4">
 
-    <h4>
+<!-- ==========================================
+     YOUR MAIN SCRIPT
+=========================================== -->
 
-        Offline Disaster Guides
 
-    </h4>
 
-    <div class="row mt-4">
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='vendor/maplibre/maplibre-gl.css') }}"
+>
 
-        <div class="col-lg-4">
+<script src="{{ url_for('static', filename='vendor/maplibre/maplibre-gl.js') }}"></script>
 
-            <div class="offline-guide">
-
-                🌊
-
-                <h5 class="mt-3">
-
-                    Flood
-
-                </h5>
-
-                <p>
-
-                    Higher ground, avoid floodwater,
-                    emergency evacuation routes.
-
-                </p>
-
-            </div>
-
-        </div>
-
-        <div class="col-lg-4">
-
-            <div class="offline-guide">
-
-                🌍
-
-                <h5 class="mt-3">
-
-                    Earthquake
-
-                </h5>
-
-                <p>
-
-                    Drop, Cover and Hold.
-                    Avoid elevators.
-
-                </p>
-
-            </div>
-
-        </div>
-
-        <div class="col-lg-4">
-
-            <div class="offline-guide">
-
-                🔥
-
-                <h5 class="mt-3">
-
-                    Fire
-
-                </h5>
-
-                <p>
-
-                    Use stairs.
-                    Stay low.
-                    Call emergency services.
-
-                </p>
-
-            </div>
-
-        </div>
-
-        <div class="col-lg-4 mt-4">
-
-            <div class="offline-guide">
-
-                🌪️
-
-                <h5 class="mt-3">
-
-                    Cyclone
-
-                </h5>
-
-                <p>
-
-                    Stay indoors.
-                    Secure loose objects.
-
-                </p>
-
-            </div>
-
-        </div>
-
-        <div class="col-lg-4 mt-4">
-
-            <div class="offline-guide">
-
-                ⚡
-
-                <h5 class="mt-3">
-
-                    Lightning
-
-                </h5>
-
-                <p>
-
-                    Avoid open fields,
-                    trees and water.
-
-                </p>
-
-            </div>
-
-        </div>
-
-        <div class="col-lg-4 mt-4">
-
-            <div class="offline-guide">
-
-                🌡️
-
-                <h5 class="mt-3">
-
-                    Heatwave
-
-                </h5>
-
-                <p>
-
-                    Stay hydrated and avoid
-                    direct sunlight.
-
-                </p>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-<!-- Downloads -->
-
-<div class="dashboard-card mt-4">
-
-    <h4>
-
-        Downloadable Resources
-
-    </h4>
-
-    <div class="row mt-4">
-
-        <div class="col-md-4">
-
-            <button 
-            type="button"
-            class="btn btn-warning w-100">
-
-                <i class="bi bi-file-earmark-pdf-fill"></i>
-
-                Disaster Handbook
-
-            </button>
-
-        </div>
-
-        <div class="col-md-4">
-
-            <button 
-            type="button"
-            class="btn btn-warning w-100">
-
-                <i class="bi bi-map-fill"></i>
-
-                Offline Maps
-
-            </button>
-
-        </div>
-
-        <div class="col-md-4">
-
-            <button 
-            type="button"
-            class="btn btn-warning w-100">
-
-                <i class="bi bi-download"></i>
-
-                Emergency Kit
-
-            </button>
-
-        </div>
-
-    </div>
-
-</div>
-
-<!-- Information -->
-
-<div class="dashboard-card mt-4 mb-5">
-
-    <div class="d-flex align-items-center">
-
-        <i class="bi bi-info-circle-fill text-warning fs-1 me-4"></i>
-
-        <div>
-
-            <h4>
-
-                Offline Mode
-
-            </h4>
-
-            <p class="mb-0">
-
-                DIVYA AI stores emergency guidance,
-                disaster safety instructions,
-                helpline numbers and downloaded maps
-                locally so they remain available
-                during network failures.
-
-            </p>
-
-        </div>
-
-    </div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
+<script src="{{ url_for('static', filename='vendor/pmtiles/pmtiles.js') }}"></script>
 
 <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+<script src="{{ url_for('static', filename='js/offline.js') }}"></script>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+<script src="{{ url_for('static', filename='js/offline.js') }}"></script>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    /* ==========================================
+       ELEMENTS
+    ========================================== */
+
+    const mapElement =
+        document.getElementById("offlineMap");
+
+    const status =
+        document.getElementById("mapStatus");
+
+    const locateButton =
+        document.getElementById("locateMe");
+
+    const viewMapsButton =
+        document.getElementById("viewMaps");
+
+    const facilitiesContainer =
+        document.getElementById("emergencyFacilities");
+
+
+    if (!mapElement) {
+        return;
+    }
+
+
+    /* ==========================================
+       MAP VARIABLES
+    ========================================== */
+
+    let map = null;
+
+    let userMarker = null;
+
+    let facilityMarkers = [];
+
+    let facilityList = [];
+
+
+    /* ==========================================
+       CHECK MAP LIBRARIES
+    ========================================== */
+
+    if (
+        typeof maplibregl === "undefined" ||
+        typeof pmtiles === "undefined"
+    ) {
+
+        console.error(
+            "MapLibre or PMTiles library is missing."
+        );
+
+        status.textContent =
+            "Offline map library could not be loaded.";
+
+        return;
+
+    }
+
+
+    /* ==========================================
+       PMTILES PROTOCOL
+    ========================================== */
+
+    const protocol =
+        new pmtiles.Protocol();
+
+    maplibregl.addProtocol(
+        "pmtiles",
+        protocol.tile
+    );
+
+
+    /* ==========================================
+       LOCAL UP MAP
+    ========================================== */
+
+    const mapFile =
+    "{{ url_for('static', filename='maps/up.pmtiles') }}";
+
+
+    /* ==========================================
+       MAP STYLE
+    ========================================== */
+
+    const mapStyle = {
+
+    version: 8,
+
+    sources: {
+
+        "up-map": {
+
+            type: "vector",
+
+            url:
+                "pmtiles://" +
+                window.location.origin +
+                "{{ url_for('static', filename='maps/up.pmtiles') }}"
+
+        }
+
+    },
+
+    layers: [
+
+        /* ==========================================
+           BACKGROUND
+        ========================================== */
+
+        {
+            id: "background",
+
+            type: "background",
+
+            paint: {
+
+                "background-color":
+                    "#F2F4F5"
+
+            }
+
+        },
+
+
+        /* ==========================================
+           WATER
+        ========================================== */
+
+        {
+            id: "water",
+
+            type: "fill",
+
+            source: "up-map",
+
+            "source-layer": "water",
+
+            paint: {
+
+                "fill-color":
+                    "#A9D8F5"
+
+            }
+
+        },
+
+
+        /* ==========================================
+           LANDUSE
+        ========================================== */
+
+        {
+            id: "landuse",
+
+            type: "fill",
+
+            source: "up-map",
+
+            "source-layer": "landuse",
+
+            paint: {
+
+                "fill-color":
+                    "#E9ECEF"
+
+            }
+
+        },
+
+
+        /* ==========================================
+           ROADS
+        ========================================== */
+
+        {
+            id: "roads",
+
+            type: "line",
+
+            source: "up-map",
+
+            "source-layer": "roads",
+
+            paint: {
+
+                "line-color":
+                    "#FFFFFF",
+
+                "line-width": [
+                    "interpolate",
+                    ["linear"],
+                    ["zoom"],
+
+                    5,
+                    0.5,
+
+                    10,
+                    1.5,
+
+                    14,
+                    4
+
+                ]
+
+            }
+
+        },
+
+
+        /* ==========================================
+           MAJOR ROADS
+        ========================================== */
+
+        {
+            id: "roads-major",
+
+            type: "line",
+
+            source: "up-map",
+
+            "source-layer": "roads",
+
+            filter: [
+                "in",
+                "class",
+                "motorway",
+                "trunk",
+                "primary"
+            ],
+
+            paint: {
+
+                "line-color":
+                    "#E08D3C",
+
+                "line-width": [
+                    "interpolate",
+                    ["linear"],
+                    ["zoom"],
+
+                    5,
+                    1,
+
+                    10,
+                    2,
+
+                    14,
+                    5
+
+                ]
+
+            }
+
+        }
+
+    ]
+
+};
+
+
+    /* ==========================================
+       CREATE MAP
+    ========================================== */
+
+    try {
+
+        map =
+            new maplibregl.Map({
+
+                container:
+                    "offlineMap",
+
+                style:
+                    mapStyle,
+
+                center: [
+                    80.9462,
+                    26.8467
+                ],
+
+                zoom:
+                    6,
+
+                minZoom:
+                    5,
+
+                maxZoom:
+                    14,
+
+                attributionControl:
+                    true
+
+            });
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Map creation error:",
+            error
+        );
+
+        status.textContent =
+            "Unable to create offline map.";
+
+        return;
+
+    }
+
+
+    /* ==========================================
+       NAVIGATION CONTROLS
+    ========================================== */
+
+    map.addControl(
+        new maplibregl.NavigationControl(),
+        "top-right"
+    );
+    
+    /* ==========================================
+   LOAD PRELOADED UP FACILITIES
+========================================== */
+
+async function loadPreloadedUPFacilities() {
+
+    try {
+
+        status.textContent =
+            "Loading Uttar Pradesh emergency facilities...";
+
+        const response = await fetch(
+            "/static/data/up_emergency_facilities.json"
+        );
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Could not load UP facility dataset."
+            );
+
+        }
+
+        const data =
+            await response.json();
+
+        if (
+            !data.facilities ||
+            !Array.isArray(data.facilities)
+        ) {
+
+            throw new Error(
+                "Invalid facility dataset."
+            );
+
+        }
+
+        clearFacilityMarkers();
+
+        facilityList = [];
+
+        data.facilities.forEach(
+            function (facility) {
+
+                if (
+                    typeof facility.latitude !== "number" ||
+                    typeof facility.longitude !== "number"
+                ) {
+                    return;
+                }
+
+                const marker =
+                    createFacilityMarker(
+                        facility
+                    );
+
+                facilityList.push({
+
+                    name:
+                        facility.name ||
+                        "Unnamed facility",
+
+                    type:
+                        facility.type ||
+                        "Emergency Facility",
+
+                    icon:
+                        facility.icon ||
+                        "📍",
+
+                    latitude:
+                        facility.latitude,
+
+                    longitude:
+                        facility.longitude,
+
+                    marker:
+                        marker
+
+                });
+
+            }
+        );
+
+        displayFacilityList();
+
+        status.textContent =
+            facilityList.length +
+            " emergency facilities loaded for Uttar Pradesh.";
+
+        console.log(
+            "Preloaded UP facilities:",
+            facilityList.length
+        );
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Preloaded facility error:",
+            error
+        );
+
+        status.textContent =
+            "Unable to load preloaded UP emergency facilities.";
+
+    }
+
+}
+
+    /* ==========================================
+       MAP LOADED
+    ========================================== */
+
+    map.on(
+    "load",
+    function () {
+
+        console.log(
+            "Offline UP map loaded."
+        );
+
+        status.textContent =
+            "Offline Uttar Pradesh map ready.";
+
+        /* Load preloaded UP emergency facilities */
+        loadPreloadedUPFacilities();
+
+    }
+);
+
+
+    /* ==========================================
+       MAP ERROR
+    ========================================== */
+
+    map.on(
+        "error",
+        function (event) {
+
+            console.error(
+                "Map error:",
+                event
+            );
+
+            status.textContent =
+                "Offline map data could not be loaded.";
+
+        }
+    );
+
+
+    /* ==========================================
+       CLEAR FACILITY MARKERS
+    ========================================== */
+
+    function clearFacilityMarkers() {
+
+        facilityMarkers.forEach(
+            function (marker) {
+
+                marker.remove();
+
+            }
+        );
+
+        facilityMarkers = [];
+
+    }
+
+
+    /* ==========================================
+       SAVE FACILITIES LOCALLY
+    ========================================== */
+
+    function saveFacilitiesOffline(
+        facilities
+    ) {
+
+        const simplifiedFacilities =
+            facilities.map(
+                function (facility) {
+
+                    return {
+
+                        name:
+                            facility.name,
+
+                        type:
+                            facility.type,
+
+                        icon:
+                            facility.icon,
+
+                        latitude:
+                            facility.latitude,
+
+                        longitude:
+                            facility.longitude
+
+                    };
+
+                }
+            );
+
+
+        localStorage.setItem(
+
+            "divya_emergency_facilities",
+
+            JSON.stringify({
+
+                facilities:
+                    simplifiedFacilities,
+
+                timestamp:
+                    Date.now()
+
+            })
+
+        );
+
+
+        console.log(
+            "Emergency facilities saved offline:",
+            simplifiedFacilities.length
+        );
+
+    }
+
+
+    /* ==========================================
+       LOAD SAVED FACILITIES
+    ========================================== */
+
+    function loadSavedFacilities() {
+
+        const saved =
+            localStorage.getItem(
+                "divya_emergency_facilities"
+            );
+
+
+        if (!saved) {
+
+            return false;
+
+        }
+
+
+        try {
+
+            const data =
+                JSON.parse(saved);
+
+
+            if (
+                !data.facilities ||
+                !Array.isArray(
+                    data.facilities
+                )
+            ) {
+
+                return false;
+
+            }
+
+
+            clearFacilityMarkers();
+
+
+            facilityList = [];
+
+
+            data.facilities.forEach(
+                function (facility) {
+
+                    const marker =
+                        createFacilityMarker(
+                            facility
+                        );
+
+
+                    facilityList.push({
+
+                        name:
+                            facility.name,
+
+                        type:
+                            facility.type,
+
+                        icon:
+                            facility.icon,
+
+                        latitude:
+                            facility.latitude,
+
+                        longitude:
+                            facility.longitude,
+
+                        marker:
+                            marker
+
+                    });
+
+                }
+            );
+
+
+            displayFacilityList();
+
+
+            status.textContent =
+                "Offline mode: showing previously saved emergency facilities.";
+
+
+            return true;
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Saved facility error:",
+                error
+            );
+
+            return false;
+
+        }
+
+    }
+
+
+    /* ==========================================
+       CREATE FACILITY MARKER
+    ========================================== */
+
+    function createFacilityMarker(
+        facility
+    ) {
+
+        const marker =
+            new maplibregl.Marker({
+                color:
+                    "#E08D3C"
+            })
+
+            .setLngLat([
+
+                facility.longitude,
+
+                facility.latitude
+
+            ])
+
+            .setPopup(
+
+                new maplibregl.Popup()
+                    .setHTML(
+
+                        `
+                        <strong>
+                            ${facility.icon}
+                            ${facility.name}
+                        </strong>
+
+                        <br>
+
+                        ${facility.type}
+                        `
+
+                    )
+
+            )
+
+            .addTo(map);
+
+
+        facilityMarkers.push(
+            marker
+        );
+
+
+        return marker;
+
+    }
+
+
+    /* ==========================================
+       DISPLAY FACILITY LIST
+    ========================================== */
+
+    function displayFacilityList() {
+
+        if (!facilitiesContainer) {
+
+            return;
+
+        }
+
+
+        if (
+            facilityList.length ===
+            0
+        ) {
+
+            facilitiesContainer.innerHTML = `
+
+                <div class="alert alert-warning">
+
+                    No emergency facilities
+                    are currently saved.
+
+                </div>
+
+            `;
+
+            return;
+
+        }
+
+
+        let html = `
+
+            <h5 class="mb-3">
+
+                🚨 Nearby Emergency Facilities
+
+            </h5>
+
+            <div class="row">
+
+        `;
+
+
+        facilityList.forEach(
+            function (
+                facility,
+                index
+            ) {
+
+                html += `
+
+                    <div
+                        class="col-md-4 mb-3"
+                    >
+
+                        <button
+
+                            type="button"
+
+                            class="
+                                btn
+                                btn-outline-warning
+                                w-100
+                                text-start
+                                facility-button
+                            "
+
+                            data-index="${index}"
+                        >
+
+                            <strong>
+
+                                ${facility.icon}
+
+                                ${facility.name}
+
+                            </strong>
+
+                            <br>
+
+                            <small>
+
+                                ${facility.type}
+
+                            </small>
+
+                        </button>
+
+                    </div>
+
+                `;
+
+            }
+        );
+
+
+        html += `
+
+            </div>
+
+        `;
+
+
+        facilitiesContainer.innerHTML =
+            html;
+
+
+        /* ======================================
+           FACILITY BUTTON EVENTS
+        ====================================== */
+
+        facilitiesContainer
+            .querySelectorAll(
+                ".facility-button"
+            )
+            .forEach(
+                function (button) {
+
+                    button.addEventListener(
+                        "click",
+                        function () {
+
+                            const index =
+                                Number(
+                                    this.dataset.index
+                                );
+
+
+                            const facility =
+                                facilityList[
+                                    index
+                                ];
+
+
+                            if (!facility) {
+
+                                return;
+
+                            }
+
+
+                            map.flyTo({
+
+                                center: [
+
+                                    facility.longitude,
+
+                                    facility.latitude
+
+                                ],
+
+                                zoom:
+                                    16,
+
+                                essential:
+                                    true
+
+                            });
+
+
+                            facility.marker
+                                .togglePopup();
+
+                        }
+                    );
+
+                }
+            );
+
+    }
+
+
+    /* ==========================================
+       SEARCH ONLINE FACILITIES
+    ========================================== */
+
+    async function loadNearbyFacilities(
+
+        latitude,
+
+        longitude
+
+    ) {
+
+        /* ======================================
+           OFFLINE
+        ====================================== */
+
+        if (!navigator.onLine) {
+
+            console.log(
+                "Offline: loading saved facilities."
+            );
+
+
+            const loaded =
+                loadSavedFacilities();
+
+
+            if (!loaded) {
+
+                if (
+                    facilitiesContainer
+                ) {
+
+                    facilitiesContainer.innerHTML = `
+
+                        <div class="alert alert-warning">
+
+                            <strong>
+                                Offline Mode
+                            </strong>
+
+                            <br>
+
+                            No previously downloaded
+                            emergency facilities are
+                            available.
+
+                            <br><br>
+
+                            Connect to the internet once
+                            to download nearby facilities.
+
+                        </div>
+
+                    `;
+
+                }
+
+
+                status.textContent =
+                    "Offline: no saved emergency facilities available.";
+
+            }
+
+
+            return;
+
+        }
+
+
+        /* ======================================
+           ONLINE
+        ====================================== */
+
+        status.textContent =
+            "Finding nearby emergency facilities...";
+
+
+        const radius =
+            5000;
+
+
+        const query = `
+
+            [out:json][timeout:25];
+
+            (
+
+                nwr["amenity"="hospital"]
+                (around:${radius},${latitude},${longitude});
+
+                nwr["amenity"="police"]
+                (around:${radius},${latitude},${longitude});
+
+                nwr["amenity"="fire_station"]
+                (around:${radius},${latitude},${longitude});
+
+            );
+
+            out center tags;
+
+        `;
+
+
+        const url =
+            "https://overpass-api.de/api/interpreter";
+
+
+        try {
+
+            const response =
+                await fetch(
+
+                    url,
+
+                    {
+
+                        method:
+                            "POST",
+
+                        headers: {
+
+                            "Content-Type":
+                                "application/x-www-form-urlencoded"
+
+                        },
+
+                        body:
+                            "data=" +
+                            encodeURIComponent(
+                                query
+                            )
+
+                    }
+
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Overpass request failed"
+                );
+
+            }
+
+
+            const data =
+                await response.json();
+
+
+            clearFacilityMarkers();
+
+
+            facilityList = [];
+
+
+            if (
+                facilitiesContainer
+            ) {
+
+                facilitiesContainer.innerHTML =
+                    "";
+
+            }
+
+
+            data.elements.forEach(
+                function (element) {
+
+                    let latitude =
+                        element.lat;
+
+                    let longitude =
+                        element.lon;
+
+
+                    /* ==================================
+                       WAYS / RELATIONS
+                    ================================== */
+
+                    if (
+
+                        latitude ===
+                            undefined &&
+
+                        element.center
+
+                    ) {
+
+                        latitude =
+                            element.center.lat;
+
+                        longitude =
+                            element.center.lon;
+
+                    }
+
+
+                    if (
+
+                        latitude ===
+                            undefined ||
+
+                        longitude ===
+                            undefined
+
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    const tags =
+                        element.tags ||
+                        {};
+
+
+                    const name =
+                        tags.name ||
+                        "Unnamed facility";
+
+
+                    let type =
+                        "Emergency Facility";
+
+
+                    let icon =
+                        "📍";
+
+
+                    if (
+                        tags.amenity ===
+                        "hospital"
+                    ) {
+
+                        type =
+                            "Hospital";
+
+                        icon =
+                            "🏥";
+
+                    }
+
+                    else if (
+                        tags.amenity ===
+                        "police"
+                    ) {
+
+                        type =
+                            "Police Station";
+
+                        icon =
+                            "🚓";
+
+                    }
+
+                    else if (
+                        tags.amenity ===
+                        "fire_station"
+                    ) {
+
+                        type =
+                            "Fire Station";
+
+                        icon =
+                            "🚒";
+
+                    }
+
+
+                    const facility = {
+
+                        name:
+                            name,
+
+                        type:
+                            type,
+
+                        icon:
+                            icon,
+
+                        latitude:
+                            latitude,
+
+                        longitude:
+                            longitude
+
+                    };
+
+
+                    const marker =
+                        createFacilityMarker(
+                            facility
+                        );
+
+
+                    facilityList.push({
+
+                        name:
+                            name,
+
+                        type:
+                            type,
+
+                        icon:
+                            icon,
+
+                        latitude:
+                            latitude,
+
+                        longitude:
+                            longitude,
+
+                        marker:
+                            marker
+
+                    });
+
+                }
+            );
+
+
+            /* ======================================
+               SAVE FOR OFFLINE USE
+            ====================================== */
+
+            saveFacilitiesOffline(
+                facilityList
+            );
+
+
+            /* ======================================
+               DISPLAY
+            ====================================== */
+
+            if (
+                facilityList.length ===
+                0
+            ) {
+
+                if (
+                    facilitiesContainer
+                ) {
+
+                    facilitiesContainer.innerHTML = `
+
+                        <div class="alert alert-warning">
+
+                            No mapped emergency facilities
+                            were found within 5 km.
+
+                        </div>
+
+                    `;
+
+                }
+
+
+                status.textContent =
+                    "No mapped emergency facilities found within 5 km.";
+
+                return;
+
+            }
+
+
+            displayFacilityList();
+
+
+            status.textContent =
+
+                facilityList.length +
+
+                " emergency facilities found within 5 km and saved for offline use.";
+
+        }
+
+
+        catch (error) {
+
+            console.error(
+                "Facility search error:",
+                error
+            );
+
+
+            /* ==================================
+               FALL BACK TO SAVED DATA
+            ================================== */
+
+            const loaded =
+                loadSavedFacilities();
+
+
+            if (!loaded) {
+
+                if (
+                    facilitiesContainer
+                ) {
+
+                    facilitiesContainer.innerHTML = `
+
+                        <div class="alert alert-info">
+
+                            <strong>
+                                Nearby facilities unavailable
+                            </strong>
+
+                            <br>
+
+                            Connect to the internet
+                            to download emergency
+                            facility information.
+
+                        </div>
+
+                    `;
+
+                }
+
+
+                status.textContent =
+                    "Facility search unavailable.";
+
+            }
+
+        }
+
+    }
+
+
+    /* ==========================================
+       LOCATION
+    ========================================== */
+
+    function locateUser() {
+
+        status.textContent =
+            "Requesting your location...";
+
+
+        if (
+            !navigator.geolocation
+        ) {
+
+            status.textContent =
+                "Geolocation is not supported by this browser.";
+
+            return;
+
+        }
+
+
+        navigator.geolocation.getCurrentPosition(
+
+            function (position) {
+
+                const latitude =
+                    position.coords.latitude;
+
+                const longitude =
+                    position.coords.longitude;
+
+
+                console.log(
+                    "USER LOCATION:",
+                    latitude,
+                    longitude
+                );
+
+
+                /* ==================================
+                   SAVE LOCATION
+                ================================== */
+
+                localStorage.setItem(
+
+                    "divya_last_location",
+
+                    JSON.stringify({
+
+                        latitude:
+                            latitude,
+
+                        longitude:
+                            longitude,
+
+                        timestamp:
+                            Date.now()
+
+                    })
+
+                );
+
+
+                /* ==================================
+                   CENTER MAP
+                ================================== */
+
+                map.flyTo({
+
+                    center: [
+
+                        longitude,
+
+                        latitude
+
+                    ],
+
+                    zoom:
+                        14,
+
+                    essential:
+                        true
+
+                });
+
+
+                /* ==================================
+                   REMOVE OLD MARKER
+                ================================== */
+
+                if (
+                    userMarker
+                ) {
+
+                    userMarker.remove();
+
+                }
+
+
+                /* ==================================
+                   USER MARKER
+                ================================== */
+
+                userMarker =
+
+                    new maplibregl.Marker({
+
+                        color:
+                            "#D64545"
+
+                    })
+
+                    .setLngLat([
+
+                        longitude,
+
+                        latitude
+
+                    ])
+
+                    .setPopup(
+
+                        new maplibregl.Popup()
+                            .setHTML(
+
+                                `
+
+                                <strong>
+                                    📍 Your Location
+                                </strong>
+
+                                <br>
+
+                                ${latitude.toFixed(5)},
+                                ${longitude.toFixed(5)}
+
+                                `
+
+                            )
+
+                    )
+
+                    .addTo(map);
+
+
+                /* ==================================
+                   LOAD FACILITIES
+                ================================== */
+
+                loadNearbyFacilities(
+
+                    latitude,
+
+                    longitude
+
+                );
+
+            },
+
+
+            function (error) {
+
+                console.error(
+                    "Location error:",
+                    error
+                );
+
+
+                if (
+                    error.code ===
+                    1
+                ) {
+
+                    status.textContent =
+                        "Location permission was denied. Please allow location access.";
+
+                }
+
+                else if (
+                    error.code ===
+                    2
+                ) {
+
+                    status.textContent =
+                        "Your location could not be determined.";
+
+                }
+
+                else {
+
+                    status.textContent =
+                        "Unable to obtain your location.";
+
+                }
+
+            },
+
+
+            {
+
+                enableHighAccuracy:
+                    true,
+
+                timeout:
+                    10000,
+
+                maximumAge:
+                    60000
+
+            }
+
+        );
+
+    }
+
+
+    /* ==========================================
+       FIND MY LOCATION
+    ========================================== */
+
+    if (
+        locateButton
+    ) {
+
+        locateButton.addEventListener(
+
+            "click",
+
+            locateUser
+
+        );
+
+    }
+
+
+    if (
+        viewMapsButton
+    ) {
+
+        viewMapsButton.addEventListener(
+
+            "click",
+
+            function () {
+
+                locateUser();
+
+
+                mapElement.scrollIntoView({
+
+                    behavior:
+                        "smooth"
+
+                });
+
+            }
+
+        );
+
+    }
+
+
+    /* ==========================================
+       LOAD LAST LOCATION WHEN OFFLINE
+    ========================================== */
+
+    if (
+        !navigator.onLine
+    ) {
+
+        const savedLocation =
+            localStorage.getItem(
+                "divya_last_location"
+            );
+
+
+        if (savedLocation) {
+
+            try {
+
+                const location =
+                    JSON.parse(
+                        savedLocation
+                    );
+
+
+                map.flyTo({
+
+                    center: [
+
+                        location.longitude,
+
+                        location.latitude
+
+                    ],
+
+                    zoom:
+                        12
+
+                });
+
+
+                userMarker =
+
+                    new maplibregl.Marker({
+
+                        color:
+                            "#D64545"
+
+                    })
+
+                    .setLngLat([
+
+                        location.longitude,
+
+                        location.latitude
+
+                    ])
+
+                    .setPopup(
+
+                        new maplibregl.Popup()
+                            .setHTML(
+
+                                `
+
+                                <strong>
+                                    📍 Last Known Location
+                                </strong>
+
+                                <br>
+
+                                DIVYA AI is offline.
+
+                                `
+
+                            )
+
+                    )
+
+                    .addTo(map);
+
+
+                loadSavedFacilities();
+
+
+                status.textContent =
+                    "Offline mode: using saved location and emergency facilities.";
+
+            }
+
+            catch (error) {
+
+                console.error(
+                    "Saved location error:",
+                    error
+                );
+
+            }
+
+        }
+
+    }
+
+
+    /* ==========================================
+       EMERGENCY GUIDE
+    ========================================== */
+
+    const openGuide =
+        document.getElementById(
+            "openGuide"
+        );
+
+
+    if (openGuide) {
+
+        openGuide.addEventListener(
+
+            "click",
+
+            function () {
+
+                alert(
+
+                    "DIVYA AI Emergency Handbook\n\n" +
+
+                    "🌊 FLOOD\n" +
+                    "Move to safer or higher ground. " +
+                    "Avoid moving floodwater.\n\n" +
+
+                    "🌍 EARTHQUAKE\n" +
+                    "Drop, Cover and Hold. " +
+                    "Stay away from windows.\n\n" +
+
+                    "🔥 FIRE\n" +
+                    "Leave using stairs where possible. " +
+                    "Stay low if smoke is present.\n\n" +
+
+                    "🌪️ CYCLONE\n" +
+                    "Stay indoors and follow official " +
+                    "evacuation instructions.\n\n" +
+
+                    "⚡ LIGHTNING\n" +
+                    "Move indoors and avoid open areas.\n\n" +
+
+                    "🌡️ HEATWAVE\n" +
+                    "Drink water regularly and avoid " +
+                    "prolonged exposure to extreme heat."
+
+                );
+
+            }
+
+        );
+
+    }
+
+
+    /* ==========================================
+       EMERGENCY CONTACTS
+    ========================================== */
+
+    const viewContacts =
+        document.getElementById(
+            "viewContacts"
+        );
+
+
+    if (viewContacts) {
+
+        viewContacts.addEventListener(
+
+            "click",
+
+            function () {
+
+                alert(
+
+                    "Emergency Numbers\n\n" +
+
+                    "Emergency: 112\n" +
+
+                    "Police: 100\n" +
+
+                    "Fire: 101\n" +
+
+                    "Ambulance: 108"
+
+                );
+
+            }
+
+        );
+
+    }
+
+
+    /* ==========================================
+       MEDICAL KIT
+    ========================================== */
+
+    const openMedicalKit =
+        document.getElementById(
+            "openMedicalKit"
+        );
+
+
+    if (openMedicalKit) {
+
+        openMedicalKit.addEventListener(
+
+            "click",
+
+            function () {
+
+                alert(
+
+                    "Emergency Medical Kit\n\n" +
+
+                    "• First-aid supplies\n" +
+                    "• Bandages\n" +
+                    "• Antiseptic supplies\n" +
+                    "• Clean water\n" +
+                    "• Personal medicines\n" +
+                    "• Disposable gloves\n" +
+                    "• Flashlight\n" +
+                    "• Emergency contact information\n\n" +
+
+                    "Keep medicines in their original packaging " +
+                    "and follow their labels or medical advice."
+
+                );
+
+            }
+
+        );
+
+    }
+
+
+    /* ==========================================
+       DOWNLOAD TEXT FILE
+    ========================================== */
+
+    function downloadTextFile(
+
+        filename,
+
+        content
+
+    ) {
+
+        const blob =
+            new Blob(
+
+                [content],
+
+                {
+
+                    type:
+                        "text/plain;charset=utf-8"
+
+                }
+
+            );
+
+
+        const url =
+            URL.createObjectURL(
+                blob
+            );
+
+
+        const link =
+            document.createElement(
+                "a"
+            );
+
+
+        link.href =
+            url;
+
+
+        link.download =
+            filename;
+
+
+        document.body.appendChild(
+            link
+        );
+
+
+        link.click();
+
+
+        document.body.removeChild(
+            link
+        );
+
+
+        URL.revokeObjectURL(
+            url
+        );
+
+    }
+
+
+    /* ==========================================
+       OFFLINE KIT
+    ========================================== */
+
+    const downloadOfflineKit =
+        document.getElementById(
+            "downloadOfflineKit"
+        );
+
+
+    if (
+        downloadOfflineKit
+    ) {
+
+        downloadOfflineKit.addEventListener(
+
+            "click",
+
+            function () {
+
+                downloadTextFile(
+
+                    "DIVYA_AI_Emergency_Kit.txt",
+
+                    `DIVYA AI
+OFFLINE EMERGENCY KIT
+
+EMERGENCY NUMBERS
+Emergency: 112
+Police: 100
+Fire: 101
+Ambulance: 108
+
+PREPAREDNESS CHECKLIST
+- Water Supply
+- Dry Food
+- Torch and Batteries
+- First Aid Kit
+- Power Bank
+- Medicines
+- Important Documents
+- Emergency Radio
+
+FLOOD
+Move to safer or higher ground.
+Avoid moving floodwater.
+
+EARTHQUAKE
+Drop, Cover and Hold.
+Stay away from windows.
+
+FIRE
+Leave the building safely.
+Use stairs where possible.
+
+CYCLONE
+Stay indoors.
+Follow official evacuation instructions.
+
+LIGHTNING
+Move indoors.
+Avoid open areas and isolated trees.
+
+HEATWAVE
+Drink water regularly.
+Avoid prolonged exposure to extreme heat.
+`
+
+                );
+
+            }
+
+        );
+
+    }
+
+
+    /* ==========================================
+       HANDBOOK DOWNLOAD
+    ========================================== */
+
+    const downloadHandbook =
+        document.getElementById(
+            "downloadHandbook"
+        );
+
+
+    if (
+        downloadHandbook
+    ) {
+
+        downloadHandbook.addEventListener(
+
+            "click",
+
+            function () {
+
+                downloadTextFile(
+
+                    "DIVYA_AI_Disaster_Handbook.txt",
+
+                    `DIVYA AI DISASTER HANDBOOK
+
+FLOOD
+- Move to safer or higher ground.
+- Avoid moving floodwater.
+- Follow official evacuation instructions.
+
+EARTHQUAKE
+- Drop, Cover and Hold.
+- Stay away from windows.
+- Avoid elevators.
+
+FIRE
+- Leave the building safely.
+- Use stairs where possible.
+- Stay low if smoke is present.
+
+CYCLONE
+- Stay indoors.
+- Secure loose objects.
+- Follow official warnings.
+
+LIGHTNING
+- Move indoors.
+- Avoid open areas and isolated trees.
+
+HEATWAVE
+- Drink water regularly.
+- Avoid prolonged exposure to extreme heat.
+`
+
+                );
+
+            }
+
+        );
+
+    }
+
+
+    /* ==========================================
+       MAP DOWNLOAD
+    ========================================== */
+
+    const downloadMaps =
+        document.getElementById(
+            "downloadMaps"
+        );
+
+
+    if (
+        downloadMaps
+    ) {
+
+        downloadMaps.addEventListener(
+
+            "click",
+
+            function () {
+
+                alert(
+
+                    "DIVYA AI Offline Map\n\n" +
+
+                    "The Uttar Pradesh offline map " +
+                    "will be available locally inside " +
+                    "DIVYA AI once the UP map package " +
+                    "has been installed.\n\n" +
+
+                    "Your saved emergency facilities " +
+                    "will also remain available offline."
+
+                );
+
+            }
+
+        );
+
+    }
+
+
+    /* ==========================================
+       EMERGENCY KIT DOWNLOAD
+    ========================================== */
+
+    const downloadEmergencyKit =
+        document.getElementById(
+            "downloadEmergencyKit"
+        );
+
+
+    if (
+        downloadEmergencyKit
+    ) {
+
+        downloadEmergencyKit.addEventListener(
+
+            "click",
+
+            function () {
+
+                downloadTextFile(
+
+                    "DIVYA_AI_Preparedness_Checklist.txt",
+
+                    `DIVYA AI
+EMERGENCY PREPAREDNESS CHECKLIST
+
+[ ] Water Supply
+[ ] Dry Food
+[ ] Torch and Batteries
+[ ] First Aid Kit
+[ ] Power Bank
+[ ] Medicines
+[ ] Important Documents
+[ ] Emergency Radio
+
+EMERGENCY NUMBERS
+
+112 - Emergency
+100 - Police
+101 - Fire
+108 - Ambulance
+`
+
+                );
+
+            }
+
+        );
+
+    }
+
+
+    /* ==========================================
+       INITIAL STATUS
+    ========================================== */
+
+    if (
+        navigator.onLine
+    ) {
+
+        status.textContent =
+            "Online. Click 'Locate Me' to find nearby emergency facilities.";
+
+    }
+
+    else {
+
+        status.textContent =
+            "Offline mode. Using locally saved emergency information.";
+
+    }
+
+});
+
+</script>
+
 
 </body>
 

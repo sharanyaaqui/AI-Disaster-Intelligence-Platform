@@ -42,11 +42,13 @@ href="{{ url_for('static', filename='css/style.css') }}">
 
             <li><a href="{{ url_for('dashboard') }}"><i class="bi bi-grid-fill"></i> Dashboard</a></li>
 
-            <li><a href="{{ url_for('report') }}"><i class="bi bi-exclamation-triangle-fill"></i> Report Incident</a></li>
+            <li><a href="{{ url_for('report_page') }}"><i class="bi bi-exclamation-triangle-fill"></i> Report Incident</a></li>
 
-            <li><a href="{{ url_for('chatbot') }}"><i class="bi bi-robot"></i> Ask DIVYA</a></li>
+            <li><a href="{{ url_for('chatbot_page') }}"><i class="bi bi-robot"></i> Ask DIVYA</a></li>
 
             <li><a href="{{ url_for('recommendation') }}"><i class="bi bi-shield-check"></i> Safety Guidance</a></li>
+
+            <li><a href="{{ url_for('offline') }}"><i class="bi bi-wifi-off"></i> Offline Resources</a></li>
 
             <li><a href="{{ url_for('profile') }}" class="active"><i class="bi bi-person-circle"></i> Profile</a></li>
 

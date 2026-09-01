@@ -43,13 +43,15 @@ DIVYA <span class="text-warning">AI</span>
 
 <li><a href="{{ url_for('dashboard') }}"><i class="bi bi-grid-fill"></i> Dashboard</a></li>
 
-<li><a href="{{ url_for('report') }}"><i class="bi bi-exclamation-triangle-fill"></i> Report Incident</a></li>
+<li><a href="{{ url_for('report_page') }}"><i class="bi bi-exclamation-triangle-fill"></i> Report Incident</a></li>
 
-<li><a href="{{ url_for('chatbot') }}"><i class="bi bi-robot"></i> Ask DIVYA</a></li>
+<li><a href="{{ url_for('chatbot_page') }}"><i class="bi bi-robot"></i> Ask DIVYA</a></li>
 
 <li><a class="active" href="{{ url_for('recommendation') }}"><i class="bi bi-shield-check"></i> Safety Guidance</a></li>
 
-<li><a href="#"><i class="bi bi-person-circle"></i> Profile</a></li>
+<li><a href="{{ url_for('offline') }}"><i class="bi bi-wifi-off"></i> Offline Resources</a></li>
+
+<li><a href="{{ url_for('profile') }}"><i class="bi bi-person-circle"></i> Profile</a></li>
 
 </ul>
 
@@ -71,41 +73,51 @@ DIVYA <span class="text-warning">AI</span>
 
 <div class="dashboard-card">
 
-<div class="row">
+    <div class="row">
 
-<div class="col-md-3 text-center">
+        <div class="col-md-3 text-center">
 
-<h6>Current Risk</h6>
+            <h6>Current Risk</h6>
 
-<h2 class="text-danger">HIGH</h2>
+            <h2 id="recommendationRisk"
+                class="text-danger">
+                -
+            </h2>
 
-</div>
+        </div>
 
-<div class="col-md-3 text-center">
+        <div class="col-md-3 text-center">
 
-<h6>Disaster Type</h6>
+            <h6>Disaster Type</h6>
 
-<h2>Flood</h2>
+            <h2 id="recommendationDisaster">
+                -
+            </h2>
 
-</div>
+        </div>
 
-<div class="col-md-3 text-center">
+        <div class="col-md-3 text-center">
 
-<h6>AI Confidence</h6>
+            <h6>AI Confidence</h6>
 
-<h2>96%</h2>
+            <h2 id="recommendationConfidence">
+                -
+            </h2>
 
-</div>
+        </div>
 
-<div class="col-md-3 text-center">
+        <div class="col-md-3 text-center">
 
-<h6>Priority</h6>
+            <h6>Priority</h6>
 
-<h2 class="text-warning">Immediate</h2>
+            <h2 id="recommendationPriority"
+                class="text-warning">
+                -
+            </h2>
 
-</div>
+        </div>
 
-</div>
+    </div>
 
 </div>
 
@@ -113,83 +125,22 @@ DIVYA <span class="text-warning">AI</span>
 
 <div class="dashboard-card mt-4">
 
-<h4 class="mb-4">
+    <h4 class="mb-4" id="recommendationTitle">
 
-Recommended Actions
+        🛡 Safety Recommendations
 
-</h4>
+    </h4>
 
-<div class="recommendation-item danger">
+    <p id="recommendationSubtitle"
+       class="text-muted mb-4">
 
-<i class="bi bi-exclamation-triangle-fill"></i>
+        Select a disaster type to view safety guidance.
 
-<div>
+    </p>
 
-<h5>Evacuate Low-Lying Areas</h5>
+    <div id="recommendationTips">
 
-<p>
-
-Move to higher ground immediately if instructed by authorities.
-
-</p>
-
-</div>
-
-</div>
-
-<div class="recommendation-item warning">
-
-<i class="bi bi-water"></i>
-
-<div>
-
-<h5>Avoid Flood Water</h5>
-
-<p>
-
-Do not walk or drive through flooded roads.
-
-</p>
-
-</div>
-
-</div>
-
-<div class="recommendation-item success">
-
-<i class="bi bi-house-check-fill"></i>
-
-<div>
-
-<h5>Prepare Emergency Kit</h5>
-
-<p>
-
-Carry food, water, medicines, flashlight and important documents.
-
-</p>
-
-</div>
-
-</div>
-
-<div class="recommendation-item primary">
-
-<i class="bi bi-broadcast"></i>
-
-<div>
-
-<h5>Stay Updated</h5>
-
-<p>
-
-Keep monitoring NDMA and local administration alerts.
-
-</p>
-
-</div>
-
-</div>
+    </div>
 
 </div>
 
@@ -205,53 +156,36 @@ Personalized Recommendations
 
 <table class="table table-bordered">
 
-<tr>
+    <thead>
+        <tr>
+            <th>Factor</th>
+            <th>Personalized Recommendation</th>
+        </tr>
+    </thead>
 
-<th>Factor</th>
+    <tbody id="personalizedRecommendations">
 
-<th>Recommendation</th>
+        <tr>
+            <td>Location</td>
+            <td>Checking location risk...</td>
+        </tr>
 
-</tr>
+        <tr>
+            <td>Transportation</td>
+            <td>Checking safest travel option...</td>
+        </tr>
 
-<tr>
+        <tr>
+            <td>Emergency Preparation</td>
+            <td>Preparing recommendations...</td>
+        </tr>
 
-<td>Location</td>
+        <tr>
+            <td>Nearest Shelter</td>
+            <td>Checking available shelters...</td>
+        </tr>
 
-<td>Flood-prone Zone</td>
-
-</tr>
-
-<tr>
-
-<td>Age Group</td>
-
-<td>Adult</td>
-
-</tr>
-
-<tr>
-
-<td>Medical Needs</td>
-
-<td>Carry prescribed medicines</td>
-
-</tr>
-
-<tr>
-
-<td>Transportation</td>
-
-<td>Use official evacuation routes</td>
-
-</tr>
-
-<tr>
-
-<td>Nearest Shelter</td>
-
-<td>Government Relief Camp - 2.4 km</td>
-
-</tr>
+    </tbody>
 
 </table>
 
@@ -261,9 +195,9 @@ Personalized Recommendations
 
 <div class="dashboard-card mt-4">
 
-<h4 class="mb-4">
+<h4 class="mb-4" id="kitTitle">
 
-Emergency Kit Checklist
+    Emergency Kit Checklist
 
 </h4>
 
@@ -353,7 +287,10 @@ Important Documents
 
 <div class="col-md-6">
 
-<button class="btn btn-warning w-100">
+<button
+    type="button"
+    class="btn btn-warning w-100"
+    id="downloadSafetyGuide">
 
 <i class="bi bi-download"></i>
 
@@ -365,7 +302,10 @@ Download Safety Guide
 
 <div class="col-md-6">
 
-<button class="btn btn-success w-100">
+<button
+    type="button"
+    class="btn btn-success w-100"
+    id="shareSafetyGuide">
 
 <i class="bi bi-share-fill"></i>
 
@@ -384,8 +324,700 @@ Share With Family
 </div>
 
 </div>
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const params =
+        new URLSearchParams(window.location.search);
+
+    const disaster =
+        (params.get("disaster") || "flood").toLowerCase();
+
+
+    const guides = {
+
+        flood: {
+
+            name: "Flood",
+
+            icon: "🌊",
+
+            risk: "HIGH",
+
+            priority: "Immediate",
+
+            subtitle:
+                "Stay safe before, during and after a flood.",
+
+            tips: [
+                {
+                    title: "Move to Higher Ground",
+                    text:
+                        "Move to higher ground if water levels are rising or authorities issue an evacuation order.",
+                    icon: "bi-exclamation-triangle-fill",
+                    type: "danger"
+                },
+                {
+                    title: "Avoid Flood Water",
+                    text:
+                        "Do not walk or drive through flooded roads or moving water.",
+                    icon: "bi-water",
+                    type: "warning"
+                },
+                {
+                    title: "Prepare an Emergency Kit",
+                    text:
+                        "Keep drinking water, food, medicines, a flashlight and important documents ready.",
+                    icon: "bi-house-check-fill",
+                    type: "success"
+                },
+                {
+                    title: "Stay Updated",
+                    text:
+                        "Monitor official weather, disaster and local administration alerts.",
+                    icon: "bi-broadcast",
+                    type: "primary"
+                }
+            ],
+
+            kit:
+                "Flood Emergency Kit"
+
+        },
+
+
+        fire: {
+
+            name: "Fire",
+
+            icon: "🔥",
+
+            risk: "HIGH",
+
+            priority: "Immediate",
+
+            subtitle:
+                "Know what to do during a fire emergency.",
+
+            tips: [
+                {
+                    title: "Raise the Alarm",
+                    text:
+                        "Alert people nearby and leave the area using the safest available exit.",
+                    icon: "bi-bell-fill",
+                    type: "danger"
+                },
+                {
+                    title: "Avoid Smoke",
+                    text:
+                        "Stay low if smoke is present and avoid entering smoke-filled areas.",
+                    icon: "bi-cloud-haze-fill",
+                    type: "warning"
+                },
+                {
+                    title: "Do Not Use Elevators",
+                    text:
+                        "Use stairs and follow marked emergency exits.",
+                    icon: "bi-building",
+                    type: "success"
+                },
+                {
+                    title: "Contact Emergency Services",
+                    text:
+                        "Move to a safe location and contact the appropriate emergency service.",
+                    icon: "bi-telephone-fill",
+                    type: "primary"
+                }
+            ],
+
+            kit:
+                "Fire Emergency Kit"
+
+        },
+
+
+        cyclone: {
+
+            name: "Cyclone",
+
+            icon: "🌪️",
+
+            risk: "HIGH",
+
+            priority: "Immediate",
+
+            subtitle:
+                "Prepare yourself and your home for severe weather.",
+
+            tips: [
+                {
+                    title: "Stay Indoors",
+                    text:
+                        "Remain indoors and stay away from windows during severe conditions.",
+                    icon: "bi-house-fill",
+                    type: "danger"
+                },
+                {
+                    title: "Secure Loose Objects",
+                    text:
+                        "Secure outdoor objects that could become dangerous in strong winds.",
+                    icon: "bi-shield-check",
+                    type: "warning"
+                },
+                {
+                    title: "Prepare Supplies",
+                    text:
+                        "Keep water, food, medicines, a flashlight and charged devices ready.",
+                    icon: "bi-box-seam-fill",
+                    type: "success"
+                },
+                {
+                    title: "Monitor Official Alerts",
+                    text:
+                        "Follow official weather and evacuation instructions.",
+                    icon: "bi-broadcast",
+                    type: "primary"
+                }
+            ],
+
+            kit:
+                "Cyclone Emergency Kit"
+
+        },
+
+
+        earthquake: {
+
+            name: "Earthquake",
+
+            icon: "🌎",
+
+            risk: "HIGH",
+
+            priority: "Immediate",
+
+            subtitle:
+                "Know how to protect yourself during an earthquake.",
+
+            tips: [
+                {
+                    title: "Drop, Cover and Hold On",
+                    text:
+                        "Protect yourself under sturdy furniture and hold on until the shaking stops.",
+                    icon: "bi-shield-fill-check",
+                    type: "danger"
+                },
+                {
+                    title: "Stay Away From Windows",
+                    text:
+                        "Keep away from glass, shelves and objects that may fall.",
+                    icon: "bi-window",
+                    type: "warning"
+                },
+                {
+                    title: "Check Your Surroundings",
+                    text:
+                        "After shaking stops, watch for hazards before moving to another location.",
+                    icon: "bi-house-check-fill",
+                    type: "success"
+                },
+                {
+                    title: "Follow Official Instructions",
+                    text:
+                        "Follow emergency instructions from local authorities.",
+                    icon: "bi-broadcast",
+                    type: "primary"
+                }
+            ],
+
+            kit:
+                "Earthquake Emergency Kit"
+
+        }
+
+    };
+
+
+    const guide =
+        guides[disaster] || guides.flood;
+
+
+    // -----------------------------
+    // Disaster title
+    // -----------------------------
+
+    document.getElementById(
+        "recommendationTitle"
+    ).textContent =
+        `${guide.icon} ${guide.name} Safety Recommendations`;
+
+
+    // -----------------------------
+    // Subtitle
+    // -----------------------------
+
+    document.getElementById(
+        "recommendationSubtitle"
+    ).textContent =
+        guide.subtitle;
+
+
+    // -----------------------------
+    // Risk
+    // -----------------------------
+
+    const riskElement =
+        document.getElementById(
+            "recommendationRisk"
+        );
+
+    riskElement.textContent =
+        guide.risk;
+
+    riskElement.className =
+        guide.risk === "HIGH"
+            ? "text-danger"
+            : "text-warning";
+
+
+    // -----------------------------
+    // Disaster type
+    // -----------------------------
+
+    document.getElementById(
+        "recommendationDisaster"
+    ).textContent =
+        guide.name;
+
+
+    // -----------------------------
+    // Priority
+    // -----------------------------
+
+    document.getElementById(
+        "recommendationPriority"
+    ).textContent =
+        guide.priority;
+
+
+    // -----------------------------
+    // AI confidence
+    // -----------------------------
+
+    const confidenceElement =
+        document.getElementById(
+            "recommendationConfidence"
+        );
+
+    const savedResult =
+        localStorage.getItem("latestAIResult");
+
+
+    if (savedResult) {
+
+        try {
+
+            const result =
+                JSON.parse(savedResult);
+
+            if (
+                result.confidence !== undefined
+            ) {
+
+                confidenceElement.textContent =
+                    Number(
+                        result.confidence
+                    ).toFixed(2) + "%";
+
+            } else {
+
+                confidenceElement.textContent =
+                    "-";
+
+            }
+
+        } catch (error) {
+
+            console.error(
+                "Unable to read AI result:",
+                error
+            );
+
+            confidenceElement.textContent =
+                "-";
+        }
+
+    } else {
+
+        confidenceElement.textContent =
+            "-";
+
+    }
+
+
+    // -----------------------------
+    // Safety recommendations
+    // -----------------------------
+
+    const tipsContainer =
+        document.getElementById(
+            "recommendationTips"
+        );
+
+    tipsContainer.innerHTML = "";
+
+
+    guide.tips.forEach(function (tip) {
+
+        const item =
+            document.createElement("div");
+
+        item.className =
+            `recommendation-item ${tip.type}`;
+
+
+        item.innerHTML = `
+
+            <i class="bi ${tip.icon}"></i>
+
+            <div>
+
+                <h5>
+                    ${tip.title}
+                </h5>
+
+                <p>
+                    ${tip.text}
+                </p>
+
+            </div>
+
+        `;
+
+
+        tipsContainer.appendChild(item);
+
+    });
+
+
+    // -----------------------------
+    // Emergency kit title
+    // -----------------------------
+
+    const kitTitle =
+        document.getElementById(
+            "kitTitle"
+        );
+
+    if (kitTitle) {
+
+        kitTitle.textContent =
+            guide.kit;
+
+    }
+
+});
+
+</script>
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const params = new URLSearchParams(
+        window.location.search
+    );
+
+    const disaster =
+        (params.get("disaster") || "flood").toLowerCase();
+
+    const recommendations = {
+
+        flood: {
+            location:
+                "Avoid low-lying and flood-prone areas.",
+
+            transportation:
+                "Avoid flooded roads and follow official evacuation routes.",
+
+            preparation:
+                "Keep drinking water, food, flashlight and important documents ready.",
+
+            shelter:
+                "Move toward the nearest designated flood relief shelter if evacuation is advised."
+        },
+
+        fire: {
+            location:
+                "Stay away from the affected building or fire zone.",
+
+            transportation:
+                "Keep access roads clear for emergency vehicles.",
+
+            preparation:
+                "Keep emergency contacts available and know the nearest safe exit.",
+
+            shelter:
+                "Move to a safe open area away from smoke and fire."
+        },
+
+        cyclone: {
+            location:
+                "Stay indoors and move away from windows and exposed areas.",
+
+            transportation:
+                "Avoid unnecessary travel during severe weather.",
+
+            preparation:
+                "Keep water, food, flashlight, power bank and emergency supplies ready.",
+
+            shelter:
+                "Use an officially designated cyclone shelter if evacuation is ordered."
+        },
+
+        earthquake: {
+            location:
+                "Stay away from damaged buildings and areas with falling-object hazards.",
+
+            transportation:
+                "Avoid damaged roads, bridges and structures.",
+
+            preparation:
+                "Keep an emergency kit, flashlight, water and important documents ready.",
+
+            shelter:
+                "Move to a safe open area after shaking stops if the building is unsafe."
+        }
+
+    };
+
+
+    const recommendation =
+        recommendations[disaster] || recommendations.flood;
+
+
+    const table =
+        document.getElementById(
+            "personalizedRecommendations"
+        );
+
+
+    if (!table) {
+        console.error(
+            "Personalized recommendations table not found."
+        );
+        return;
+    }
+
+
+    table.innerHTML = `
+
+        <tr>
+            <td>Location</td>
+            <td>
+                ${recommendation.location}
+            </td>
+        </tr>
+
+        <tr>
+            <td>Transportation</td>
+            <td>
+                ${recommendation.transportation}
+            </td>
+        </tr>
+
+        <tr>
+            <td>Emergency Preparation</td>
+            <td>
+                ${recommendation.preparation}
+            </td>
+        </tr>
+
+        <tr>
+            <td>Nearest Shelter</td>
+            <td>
+                ${recommendation.shelter}
+            </td>
+        </tr>
+
+    `;
+
+});
+
+</script>
 
 <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    // ==========================================
+    // DOWNLOAD SAFETY GUIDE
+    // ==========================================
+
+    const downloadButton =
+        document.getElementById("downloadSafetyGuide");
+
+    if (downloadButton) {
+
+        downloadButton.addEventListener("click", function () {
+
+            const disaster =
+                new URLSearchParams(window.location.search)
+                    .get("disaster") || "flood";
+
+
+            const guideText = `
+DIVYA AI - SAFETY GUIDE
+=======================
+
+Disaster Type:
+${disaster.toUpperCase()}
+
+
+IMPORTANT SAFETY ACTIONS
+------------------------
+
+1. Follow official emergency alerts and instructions.
+
+2. Move away from dangerous or unstable areas.
+
+3. Keep your phone charged.
+
+4. Keep drinking water and essential supplies ready.
+
+5. Keep important documents and medicines accessible.
+
+6. Contact emergency services if you are in immediate danger.
+
+
+This safety guide is provided by DIVYA AI.
+Always follow instructions from local authorities.
+`;
+
+
+            const blob =
+                new Blob(
+                    [guideText],
+                    { type: "text/plain" }
+                );
+
+
+            const url =
+                URL.createObjectURL(blob);
+
+
+            const link =
+                document.createElement("a");
+
+            link.href = url;
+
+            link.download =
+                `DIVYA-${disaster}-Safety-Guide.txt`;
+
+
+            document.body.appendChild(link);
+
+            link.click();
+
+            document.body.removeChild(link);
+
+            URL.revokeObjectURL(url);
+
+        });
+
+    }
+
+
+    // ==========================================
+    // SHARE WITH FAMILY
+    // ==========================================
+
+    const shareButton =
+        document.getElementById("shareSafetyGuide");
+
+
+    if (shareButton) {
+
+        shareButton.addEventListener("click", async function () {
+
+            const disaster =
+                new URLSearchParams(window.location.search)
+                    .get("disaster") || "flood";
+
+
+            const shareText =
+                `DIVYA AI Safety Alert
+
+Disaster: ${disaster.toUpperCase()}
+
+Please stay alert, follow official emergency instructions, and keep emergency supplies ready.
+
+Shared via DIVYA AI.`;
+
+
+            // Use browser sharing if available
+
+            if (navigator.share) {
+
+                try {
+
+                    await navigator.share({
+
+                        title: "DIVYA AI Safety Alert",
+
+                        text: shareText
+
+                    });
+
+                }
+
+                catch (error) {
+
+                    console.log(
+                        "Share cancelled:",
+                        error
+                    );
+
+                }
+
+            }
+
+            // Fallback for browsers without Web Share API
+
+            else {
+
+                try {
+
+                    await navigator.clipboard.writeText(
+                        shareText
+                    );
+
+
+                    alert(
+                        "Safety information copied to your clipboard. You can now share it with your family."
+                    );
+
+                }
+
+                catch (error) {
+
+                    alert(
+                        "Sharing is not supported by this browser."
+                    );
+
+                }
+
+            }
+
+        });
+
+    }
+
+});
+
+</script>
 
 </body>
 

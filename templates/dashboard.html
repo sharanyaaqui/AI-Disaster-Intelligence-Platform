@@ -18,6 +18,11 @@ href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.m
 <link rel="stylesheet"
 href="{{ url_for('static', filename='css/style.css') }}">
 
+<link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+
 </head>
 
 <body>
@@ -56,20 +61,16 @@ Dashboard
 </li>
 
 <li>
+    <a href="{{ url_for('report_page') }}">
 
-<a href="{{ url_for('report') }}">
-
-<i class="bi bi-exclamation-triangle-fill"></i>
-
-Report Incident
-
-</a>
-
+    <i class="bi bi-exclamation-triangle-fill"></i>
+        Report Incident
+    </a>
 </li>
 
 <li>
 
-<a href="{{ url_for('chatbot') }}">
+<a href="{{ url_for('chatbot_page') }}">
 
 <i class="bi bi-robot"></i>
 
@@ -132,21 +133,123 @@ Welcome back !
 
 <div>
 
-<button class="btn btn-warning">
+<a href="{{ url_for('report_page') }}" class="btn btn-warning">
 
-<i class="bi bi-plus-circle"></i>
+    <i class="bi bi-plus-circle"></i>
 
-Report Incident
+    Report Incident
 
-</button>
-
+</a>
 </div>
 
 </nav>
 
 <!-- Welcome -->
+ <!-- Dashboard Statistics -->
+
+<div class="row mt-4">
+
+    <!-- Total Reports -->
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="dashboard-card stat-card">
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div>
+                    <p class="text-muted mb-1">
+                        Total Reports
+                    </p>
+
+                    <h2 id="totalReports">
+                        0
+                    </h2>
+                </div>
+
+                <i class="bi bi-file-earmark-text-fill fs-1 text-warning"></i>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- Pending -->
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="dashboard-card stat-card">
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div>
+                    <p class="text-muted mb-1">
+                        Pending Reports
+                    </p>
+
+                    <h2 id="pendingReports">
+                        0
+                    </h2>
+                </div>
+
+                <i class="bi bi-hourglass-split fs-1 text-warning"></i>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- Verified -->
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="dashboard-card stat-card">
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div>
+                    <p class="text-muted mb-1">
+                        Verified Reports
+                    </p>
+
+                    <h2 id="verifiedReports">
+                        0
+                    </h2>
+                </div>
+
+                <i class="bi bi-check-circle-fill fs-1 text-success"></i>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- Rejected -->
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="dashboard-card stat-card">
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div>
+                    <p class="text-muted mb-1">
+                        Rejected Reports
+                    </p>
+
+                    <h2 id="rejectedReports">
+                        0
+                    </h2>
+                </div>
+
+                <i class="bi bi-x-circle-fill fs-1 text-danger"></i>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
 
 <div class="container-fluid mt-4">
+    <!-- Live Statistics -->
+
+
 
 <div class="row">
 
@@ -209,21 +312,15 @@ Monitoring 24×7
 <div class="dashboard-card text-center">
 
 <h5>
-
-Risk Level
-
+    Risk Level
 </h5>
 
-<div class="risk-circle">
-
-37%
-
+<div class="risk-circle" id="riskPercentage">
+    0%
 </div>
 
-<p>
-
-LOW RISK
-
+<p id="riskLabel">
+    NO DATA
 </p>
 
 </div>
@@ -234,25 +331,22 @@ LOW RISK
 
 <div class="dashboard-card text-center">
 
-<i class="bi bi-cloud-rain display-4 text-primary"></i>
+    <i
+        id="weatherIcon"
+        class="bi bi-cloud display-4 text-primary">
+    </i>
 
-<h5 class="mt-3">
+    <h5 class="mt-3">
+        Weather
+    </h5>
 
-Weather
+    <h3 id="weatherTemperature">
+        --°C
+    </h3>
 
-</h5>
-
-<h3>
-
-29°C
-
-</h3>
-
-<p>
-
-Cloudy
-
-</p>
+    <p id="weatherCondition">
+        Loading...
+    </p>
 
 </div>
 
@@ -270,9 +364,9 @@ Alerts Today
 
 </h5>
 
-<h2>
+<h2 id="alertsToday">
 
-04
+0
 
 </h2>
 
@@ -310,7 +404,10 @@ Upload Image
 
 <div class="col-lg-3">
 
-<div class="action-card">
+    <div
+        class="action-card"
+        onclick="openReportLocation()"
+        style="cursor: pointer;">
 
 <i class="bi bi-geo-alt-fill"></i>
 
@@ -326,7 +423,10 @@ Report Location
 
 <div class="col-lg-3">
 
-<div class="action-card">
+   <div
+        class="action-card"
+        onclick="openDIVYA()"
+        style="cursor: pointer;">
 
 <i class="bi bi-chat-dots-fill"></i>
 
@@ -342,7 +442,10 @@ Ask DIVYA
 
 <div class="col-lg-3">
 
-<div class="action-card">
+<div
+    class="action-card"
+    onclick="openSafetyTips()"
+    style="cursor: pointer;">
 
 <i class="bi bi-shield-fill-check"></i>
 
@@ -364,7 +467,7 @@ Safety Tips
 
 </div>
 
-<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
 <!-- ================= MAP + ALERTS ================= -->
 
 <div class="row mt-4">
@@ -382,18 +485,7 @@ Safety Tips
                 <span class="badge bg-success">Monitoring</span>
 
             </div>
-
-            <div class="map-placeholder">
-
-                <i class="bi bi-geo-alt-fill"></i>
-
-                <h5>Interactive Disaster Map</h5>
-
-                <p>
-                    Google Maps / Leaflet Map will be integrated here
-                </p>
-
-            </div>
+<div id="disasterMap" style="height: 400px; width: 100%; border-radius: 12px;"></div>
 
         </div>
 
@@ -413,41 +505,17 @@ Safety Tips
 
             </h4>
 
-            <div class="alert-item danger">
+            <div id="recentAlerts">
 
-                <strong>Flood Warning</strong>
-
-                <p>Lucknow • High Risk</p>
-
-                <small>10 mins ago</small>
-
-            </div>
-
-            <div class="alert-item warning">
-
-                <strong>Heavy Rainfall</strong>
-
-                <p>Barabanki</p>
-
-                <small>45 mins ago</small>
-
-            </div>
-
-            <div class="alert-item success">
-
-                <strong>Situation Normal</strong>
-
-                <p>Kanpur</p>
-
-                <small>1 hour ago</small>
-
-            </div>
+            <p class="text-muted text-center">
+                Loading alerts...
+            </p>
 
         </div>
 
     </div>
 
-</div>
+ </div>
 
 <!-- ================= AI PREDICTIONS ================= -->
 
@@ -477,57 +545,15 @@ Safety Tips
 
                 </thead>
 
-                <tbody>
+                <tbody id="aiPredictionBody">
 
-                    <tr>
+    <tr>
+        <td colspan="2" class="text-center text-muted">
+            No AI prediction available yet.
+        </td>
+    </tr>
 
-                        <td>Flood</td>
-
-                        <td>
-
-                            <span class="badge bg-danger">
-
-                                84%
-
-                            </span>
-
-                        </td>
-
-                    </tr>
-
-                    <tr>
-
-                        <td>Heatwave</td>
-
-                        <td>
-
-                            <span class="badge bg-warning">
-
-                                63%
-
-                            </span>
-
-                        </td>
-
-                    </tr>
-
-                    <tr>
-
-                        <td>Landslide</td>
-
-                        <td>
-
-                            <span class="badge bg-success">
-
-                                21%
-
-                            </span>
-
-                        </td>
-
-                    </tr>
-
-                </tbody>
+</tbody>
 
             </table>
 
@@ -537,65 +563,66 @@ Safety Tips
 
     <!-- Statistics -->
 
-    <div class="col-lg-6">
+  <div class="col-lg-6">
 
-        <div class="dashboard-card">
+    <div class="dashboard-card">
 
-            <h4>
+        <h4>
+            Platform Statistics
+        </h4>
 
-                Platform Statistics
+        <div class="row text-center mt-4">
 
-            </h4>
+            <!-- Reports -->
+            <div class="col-6">
 
-            <div class="row text-center mt-4">
+                <h2
+                    id="platformReports"
+                    class="text-primary">
+                    0
+                </h2>
 
-                <div class="col-6">
+                <p>Reports</p>
 
-                    <h2 class="text-primary">
+            </div>
 
-                        1,254
 
-                    </h2>
+            <!-- Verified -->
+            <div class="col-6">
 
-                    <p>Reports</p>
+                <h2
+                    id="platformVerified"
+                    class="text-success">
+                    0
+                </h2>
 
-                </div>
+                <p>Verified</p>
 
-                <div class="col-6">
+            </div>
 
-                    <h2 class="text-success">
 
-                        97%
+            <!-- Users -->
+            <div class="col-6 mt-4">
 
-                    </h2>
+                <h2
+                    id="platformUsers"
+                    class="text-warning">
+                    0
+                </h2>
 
-                    <p>AI Accuracy</p>
+                <p>Users</p>
 
-                </div>
+            </div>
 
-                <div class="col-6 mt-4">
 
-                    <h2 class="text-warning">
+            <!-- Monitoring -->
+            <div class="col-6 mt-4">
 
-                        842
+                <h2 class="text-danger">
+                    24/7
+                </h2>
 
-                    </h2>
-
-                    <p>Users</p>
-
-                </div>
-
-                <div class="col-6 mt-4">
-
-                    <h2 class="text-danger">
-
-                        24/7
-
-                    </h2>
-
-                    <p>Monitoring</p>
-
-                </div>
+                <p>Monitoring</p>
 
             </div>
 
@@ -633,70 +660,18 @@ Safety Tips
 
                         <th>Status</th>
 
+                        <th>Actions</th>
+
                     </tr>
 
                 </thead>
 
-                <tbody>
+                <tbody id="recentReportsBody">
 
                     <tr>
-
-                        <td>#101</td>
-
-                        <td>Lucknow</td>
-
-                        <td>Flood</td>
-
-                        <td>
-
-                            <span class="badge bg-warning">
-
-                                Under Review
-
-                            </span>
-
-                        </td>
-
-                    </tr>
-
-                    <tr>
-
-                        <td>#102</td>
-
-                        <td>Prayagraj</td>
-
-                        <td>Fire</td>
-
-                        <td>
-
-                            <span class="badge bg-success">
-
-                                Verified
-
-                            </span>
-
-                        </td>
-
-                    </tr>
-
-                    <tr>
-
-                        <td>#103</td>
-
-                        <td>Varanasi</td>
-
-                        <td>Road Damage</td>
-
-                        <td>
-
-                            <span class="badge bg-primary">
-
-                                Assigned
-
-                            </span>
-
-                        </td>
-
+                      <td colspan="5" class="text-center text-muted">
+                         Loading reports...
+                      </td>
                     </tr>
 
                 </tbody>
@@ -753,11 +728,14 @@ Safety Tips
 
             </div>
 
-            <button class="btn btn-warning w-100 mt-3">
+           <a
+    href="{{ url_for('chatbot.chatbot_page') }}"
+    class="btn btn-warning w-100 mt-3">
 
-                Open Ask DIVYA
+    <i class="bi bi-chat-dots-fill me-2"></i>
+    Open Ask DIVYA
 
-            </button>
+</a>
 
         </div>
 
@@ -779,7 +757,7 @@ Safety Tips
 
                 🚑 Ambulance
 
-                <span>108</span>
+                <a href="tel:108">108</a>
 
             </div>
 
@@ -787,7 +765,7 @@ Safety Tips
 
                 🚓 Police
 
-                <span>112</span>
+                <a href="tel:112">112</a>
 
             </div>
 
@@ -795,7 +773,7 @@ Safety Tips
 
                 🚒 Fire Brigade
 
-                <span>101</span>
+                <a href="tel:101">101</a>
 
             </div>
 
@@ -803,7 +781,7 @@ Safety Tips
 
                 🆘 Disaster Helpline
 
-                <span>1078</span>
+                <a href="tel:1078">1078</a>
 
             </div>
 
@@ -817,83 +795,25 @@ Safety Tips
 
 <div class="row mt-4">
 
-<div class="col-12">
+    <div class="col-12">
 
-<div class="dashboard-card">
+        <div class="dashboard-card">
 
-<h4 class="mb-4">
+            <h4 class="mb-4">
+                Recent Activity
+            </h4>
 
-Recent Activity
+            <div class="timeline" id="recentActivity">
 
-</h4>
+                <p class="text-muted text-center">
+                    Loading recent activity...
+                </p>
 
-<div class="timeline">
+            </div>
 
-<div class="timeline-item">
+        </div>
 
-<div class="timeline-icon bg-success">
-
-<i class="bi bi-check-lg"></i>
-
-</div>
-
-<div>
-
-<h6>Report Verified</h6>
-
-<p>Citizen report #102 has been verified.</p>
-
-<small>10 minutes ago</small>
-
-</div>
-
-</div>
-
-<div class="timeline-item">
-
-<div class="timeline-icon bg-warning">
-
-<i class="bi bi-exclamation-lg"></i>
-
-</div>
-
-<div>
-
-<h6>Heavy Rain Alert</h6>
-
-<p>Weather Department issued heavy rainfall warning.</p>
-
-<small>45 minutes ago</small>
-
-</div>
-
-</div>
-
-<div class="timeline-item">
-
-<div class="timeline-icon bg-danger">
-
-<i class="bi bi-bell-fill"></i>
-
-</div>
-
-<div>
-
-<h6>Flood Alert</h6>
-
-<p>High-risk flood alert issued for nearby districts.</p>
-
-<small>1 hour ago</small>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
+    </div>
 
 </div>
 
@@ -901,61 +821,78 @@ Recent Activity
 
 <div class="row mt-4">
 
-<div class="col-md-3">
+    <!-- Flood -->
+    <div class="col-md-3">
 
-<div class="action-card">
+        <a
+    href="/recommendation?disaster=flood"
+    class="action-card text-decoration-none">
 
-<i class="bi bi-water"></i>
+            <i class="bi bi-water"></i>
 
-<h5>Flood</h5>
+            <h5>Flood</h5>
 
-<p>Safety Guide</p>
+            <p>Safety Guide</p>
 
-</div>
+        </a>
 
-</div>
+    </div>
 
-<div class="col-md-3">
 
-<div class="action-card">
+    <!-- Fire -->
+    <div class="col-md-3">
 
-<i class="bi bi-fire"></i>
+       <a
+    href="{{ url_for('recommendation') }}?disaster=fire"
+    class="action-card text-decoration-none">
 
-<h5>Fire</h5>
+            <i class="bi bi-fire"></i>
 
-<p>Preparedness</p>
+            <h5>Fire</h5>
 
-</div>
+            <p>Preparedness</p>
 
-</div>
+        </a>
 
-<div class="col-md-3">
+    </div>
 
-<div class="action-card">
 
-<i class="bi bi-wind"></i>
+    <!-- Cyclone -->
+    <div class="col-md-3">
 
-<h5>Cyclone</h5>
+        <a
+    href="{{ url_for('recommendation') }}?disaster=Cyclone"
+    class="action-card text-decoration-none">
 
-<p>Emergency Kit</p>
 
-</div>
 
-</div>
+            <i class="bi bi-wind"></i>
 
-<div class="col-md-3">
+            <h5>Cyclone</h5>
 
-<div class="action-card">
+            <p>Emergency Kit</p>
 
-<i class="bi bi-globe2"></i>
+        </a>
 
-<h5>Earthquake</h5>
+    </div>
 
-<p>Do's & Don'ts</p>
 
-</div>
+    <!-- Earthquake -->
+    <div class="col-md-3">
 
-</div>
+       <a
+    href="{{ url_for('recommendation') }}?disaster=earthquake"
+    class="action-card text-decoration-none">
+
+            <i class="bi bi-globe2"></i>
+
+            <h5>Earthquake</h5>
+
+            <p>Do's & Don'ts</p>
+
+        </a>
+
+    </div>
 
 </div>
 
@@ -1005,6 +942,1061 @@ Version 1.0
 
 </footer>
 </div>
-</body>
+<script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+</script>
+<script>
 
+async function loadRecentReports() {
+
+    const tableBody = document.getElementById("recentReportsBody");
+
+    if (!tableBody) {
+        console.error("recentReportsBody was not found.");
+        return;
+    }
+
+    try {
+
+        const response = await fetch("/reports/recent");
+
+        console.log(
+            "Recent reports HTTP status:",
+            response.status
+        );
+
+        const data = await response.json();
+
+        console.log(
+            "Recent reports data:",
+            data
+        );
+
+        if (!data.success) {
+
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="text-center text-danger">
+                        Unable to load reports.
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
+        if (!data.reports || data.reports.length === 0) {
+
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="text-center text-muted">
+                        No reports submitted yet.
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
+        tableBody.innerHTML = "";
+
+        data.reports.forEach(function(report) {
+
+            let statusClass = "bg-warning";
+
+            if (report.status === "Verified") {
+                statusClass = "bg-success";
+            }
+
+            if (report.status === "Rejected") {
+                statusClass = "bg-danger";
+            }
+
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td>#${report.id}</td>
+
+                <td>
+                    ${
+                        report.latitude !== null &&
+                        report.longitude !== null
+                        ? `${Number(report.latitude).toFixed(4)},
+                           ${Number(report.longitude).toFixed(4)}`
+                        : "Unknown"
+                    }
+                </td>
+
+                <td>
+                    ${report.disaster_type || "-"}
+                </td>
+
+                <td>
+                    <span class="badge ${statusClass}">
+                        ${report.status || "Pending"}
+                    </span>
+                </td>
+
+               <td>
+
+    <button
+        type="button"
+        class="btn btn-sm btn-primary me-1"
+        onclick="viewReport(${report.id})">
+
+        <i class="bi bi-eye"></i>
+        View
+
+    </button>
+
+    ${
+        String(report.status || "")
+        .trim()
+        .toLowerCase() === "pending"
+
+        ? `
+            <button
+                type="button"
+                class="btn btn-sm btn-success me-1"
+                onclick="verifyReport(${report.id}, 'Verified')">
+
+                <i class="bi bi-check-circle"></i>
+                Verify
+
+            </button>
+
+            <button
+                type="button"
+                class="btn btn-sm btn-danger"
+                onclick="verifyReport(${report.id}, 'Rejected')">
+
+                <i class="bi bi-x-circle"></i>
+                Reject
+
+            </button>
+          `
+
+        : `
+            <span class="text-muted">
+                No action
+            </span>
+          `
+    }
+
+</td>
+            `;
+
+            tableBody.appendChild(row);
+
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Recent reports error:",
+            error
+        );
+
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="5" class="text-center text-danger">
+                    Error loading reports.
+                </td>
+            </tr>
+        `;
+
+    }
+
+}
+
+loadRecentReports();
+
+</script>
+<script>
+
+async function verifyReport(reportId, status) {
+
+    console.log("VERIFY BUTTON CLICKED");
+    console.log("Report ID:", reportId);
+    console.log("Status:", status);
+
+    try {
+
+        const response = await fetch(
+            `/report/${reportId}/verify`,
+            {
+                method: "PUT",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    status: status
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        console.log("Verification response:", data);
+
+        if (data.success) {
+
+            alert(
+                `Report #${reportId} marked as ${status}.`
+            );
+
+            loadRecentReports();
+
+            if (typeof loadDashboardStatistics === "function") {
+                loadDashboardStatistics();
+            }
+
+        } else {
+
+            alert(
+                data.message ||
+                "Unable to update report."
+            );
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Verification error:",
+            error
+        );
+
+        alert(
+            "Unable to connect to the server."
+        );
+
+    }
+
+}
+
+</script>
+<script>
+
+async function loadDashboardStatistics() {
+
+    try {
+
+        const response = await fetch("/api/dashboard", {
+            method: "GET",
+            cache: "no-store"
+        });
+
+        console.log("Statistics HTTP status:", response.status);
+
+        const data = await response.json();
+
+        console.log("Statistics data:", data);
+
+        if (!data.success) {
+            console.error("Statistics API failed.");
+            return;
+        }
+
+        document.getElementById("totalReports").textContent =
+            data.statistics.total_reports;
+
+        document.getElementById("pendingReports").textContent =
+            data.statistics.pending_reports;
+
+        document.getElementById("verifiedReports").textContent =
+            data.statistics.verified_reports;
+
+        document.getElementById("rejectedReports").textContent =
+            data.statistics.rejected_reports;
+
+        document.getElementById("platformReports").textContent =
+            data.statistics.total_reports;  
+            
+        document.getElementById("platformVerified").textContent =
+            data.statistics.verified_reports;      
+
+    } catch (error) {
+
+        console.error(
+            "Dashboard statistics error:",
+            error
+        );
+
+    }
+
+}
+
+loadDashboardStatistics();
+
+</script>
+<script>
+
+async function viewReport(reportId) {
+
+    try {
+
+        const response = await fetch(
+            `/report/${reportId}`
+        );
+
+        const data = await response.json();
+
+        console.log("Report details:", data);
+
+        if (!data.success) {
+
+            alert(
+                data.message || "Unable to load report."
+            );
+
+            return;
+        }
+
+        const report = data.report;
+
+        alert(
+            "Report #" + report.id +
+            "\n\n" +
+            "Disaster: " + report.disaster_type +
+            "\n" +
+            "Description: " + report.description +
+            "\n" +
+            "Latitude: " + report.location.latitude +
+            "\n" +
+            "Longitude: " + report.location.longitude +
+            "\n" +
+            "Reported by: " + report.reported_by +
+            "\n" +
+            "Status: " + report.status
+        );
+
+    } catch (error) {
+
+        console.error(
+            "View report error:",
+            error
+        );
+
+        alert(
+            "Unable to load report details."
+        );
+
+    }
+
+}
+function openReportLocation() {
+
+    fetch("/reports/recent")
+        .then(response => response.json())
+        .then(data => {
+
+            if (!data.success || !data.reports.length) {
+                alert("No report locations available.");
+                return;
+            }
+
+            const report = data.reports[0];
+
+            if (
+                report.latitude === null ||
+                report.longitude === null
+            ) {
+                alert("Location is not available.");
+                return;
+            }
+
+            const mapUrl =
+                `https://www.google.com/maps?q=${report.latitude},${report.longitude}`;
+
+            window.open(mapUrl, "_blank");
+
+        })
+        .catch(error => {
+
+            console.error("Location error:", error);
+
+            alert("Unable to load report location.");
+
+        });
+}
+function openDIVYA() {
+    window.location.href = "/chatbot";
+}
+function openSafetyTips() {
+    window.location.href = "/recommendation";
+}
+async function loadRiskLevel() {
+
+    try {
+
+        const response = await fetch("/reports/recent");
+
+        const data = await response.json();
+
+        if (!data.success || !data.reports || data.reports.length === 0) {
+
+            document.getElementById("riskPercentage").textContent = "0%";
+            document.getElementById("riskLabel").textContent = "NO DATA";
+
+            return;
+        }
+
+        const reports = data.reports;
+
+        let riskPoints = 0;
+
+        reports.forEach(function(report) {
+
+            const type = String(
+                report.disaster_type || ""
+            ).toLowerCase();
+
+            if (
+                type === "earthquake" ||
+                type === "fire" ||
+                type === "cyclone" ||
+                type === "building collapse"
+            ) {
+
+                riskPoints += 30;
+
+            } else if (
+                type === "flood" ||
+                type === "landslide"
+            ) {
+
+                riskPoints += 20;
+
+            } else {
+
+                riskPoints += 10;
+
+            }
+
+        });
+
+        // Average the risk instead of adding everything together
+        let riskScore =
+            Math.round(riskPoints / reports.length);
+
+        riskScore = Math.min(riskScore, 100);
+
+        let riskLabel = "LOW RISK";
+
+        if (riskScore >= 70) {
+
+            riskLabel = "HIGH RISK";
+
+        } else if (riskScore >= 40) {
+
+            riskLabel = "MEDIUM RISK";
+
+        }
+
+        document.getElementById("riskPercentage").textContent =
+            riskScore + "%";
+
+        document.getElementById("riskLabel").textContent =
+            riskLabel;
+
+        console.log(
+            "Risk Score:",
+            riskScore,
+            riskLabel
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Risk level error:",
+            error
+        );
+
+    }
+
+}
+
+loadRiskLevel();
+
+async function loadAlertsToday() {
+
+    try {
+
+        const response = await fetch("/api/alerts-today");
+
+        const data = await response.json();
+
+        console.log("Alerts today:", data);
+
+        if (data.success) {
+
+            document.getElementById("alertsToday").textContent =
+                data.alerts_today;
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Alerts today error:",
+            error
+        );
+
+    }
+
+}
+
+loadAlertsToday();
+async function loadWeather() {
+
+    const temperatureElement =
+        document.getElementById("weatherTemperature");
+
+    const conditionElement =
+        document.getElementById("weatherCondition");
+
+    const iconElement =
+        document.getElementById("weatherIcon");
+
+    if (!navigator.geolocation) {
+
+        conditionElement.textContent =
+            "Location unavailable";
+
+        return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+
+        async function(position) {
+
+            const latitude =
+                position.coords.latitude;
+
+            const longitude =
+                position.coords.longitude;
+
+            try {
+
+                const response = await fetch(
+                    `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,weather_code&timezone=auto`
+                );
+
+                const data = await response.json();
+
+                if (!data.current) {
+
+                    conditionElement.textContent =
+                        "Weather unavailable";
+
+                    return;
+                }
+
+                const temperature =
+                    Math.round(data.current.temperature_2m);
+
+                const weatherCode =
+                    data.current.weather_code;
+
+                temperatureElement.textContent =
+                    temperature + "°C";
+
+                let condition = "Clear";
+                let icon = "bi-sun-fill";
+
+                if (weatherCode === 0) {
+
+                    condition = "Clear";
+                    icon = "bi-sun-fill";
+
+                } else if (
+                    weatherCode === 1 ||
+                    weatherCode === 2
+                ) {
+
+                    condition = "Partly Cloudy";
+                    icon = "bi-cloud-sun-fill";
+
+                } else if (weatherCode === 3) {
+
+                    condition = "Cloudy";
+                    icon = "bi-cloud-fill";
+
+                } else if (
+                    weatherCode >= 51 &&
+                    weatherCode <= 67
+                ) {
+
+                    condition = "Rain";
+                    icon = "bi-cloud-rain-fill";
+
+                } else if (
+                    weatherCode >= 80 &&
+                    weatherCode <= 82
+                ) {
+
+                    condition = "Rain Showers";
+                    icon = "bi-cloud-rain-fill";
+
+                } else if (
+                    weatherCode >= 95
+                ) {
+
+                    condition = "Thunderstorm";
+                    icon = "bi-cloud-lightning-rain-fill";
+
+                }
+
+                conditionElement.textContent =
+                    condition;
+
+                iconElement.className =
+                    `bi ${icon} display-4 text-primary`;
+
+            } catch (error) {
+
+                console.error(
+                    "Weather error:",
+                    error
+                );
+
+                conditionElement.textContent =
+                    "Weather unavailable";
+            }
+        },
+
+        function(error) {
+
+            console.error(
+                "Weather location error:",
+                error
+            );
+
+            conditionElement.textContent =
+                "Allow location access";
+
+        }
+    );
+}
+
+loadWeather();
+async function loadDisasterMap() {
+
+    const map = L.map("disasterMap").setView(
+        [26.8467, 80.9462],
+        10
+    );
+
+    L.tileLayer(
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+            attribution:
+                '&copy; OpenStreetMap contributors'
+        }
+    ).addTo(map);
+
+    try {
+
+        const response = await fetch("/reports/recent");
+
+        const data = await response.json();
+
+        if (!data.success || !data.reports.length) {
+            return;
+        }
+
+        data.reports.forEach(function(report) {
+
+            if (
+                report.latitude === null ||
+                report.longitude === null
+            ) {
+                return;
+            }
+
+            const marker = L.marker([
+                report.latitude,
+                report.longitude
+            ]).addTo(map);
+
+            marker.bindPopup(`
+                <strong>Report #${report.id}</strong><br>
+                Disaster: ${report.disaster_type}<br>
+                Status: ${report.status}<br>
+                Reported by: ${report.reported_by}
+            `);
+
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Disaster map error:",
+            error
+        );
+
+    }
+}
+
+loadDisasterMap();
+
+async function loadRecentAlerts() {
+
+    const alertsContainer =
+        document.getElementById("recentAlerts");
+
+    if (!alertsContainer) {
+        return;
+    }
+
+    try {
+
+        const response =
+            await fetch("/reports/recent");
+
+        const data =
+            await response.json();
+
+        if (
+            !data.success ||
+            !data.reports ||
+            data.reports.length === 0
+        ) {
+
+            alertsContainer.innerHTML = `
+                <p class="text-muted text-center">
+                    No recent alerts.
+                </p>
+            `;
+
+            return;
+        }
+
+        alertsContainer.innerHTML = "";
+
+        // Show latest 3 reports
+        const reports =
+            data.reports.slice(0, 3);
+
+        reports.forEach(function(report) {
+
+            let alertClass = "warning";
+
+            if (
+                report.disaster_type === "Fire" ||
+                report.disaster_type === "Earthquake" ||
+                report.disaster_type === "Building Collapse"
+            ) {
+                alertClass = "danger";
+            }
+
+            if (report.status === "Verified") {
+                alertClass = "success";
+            }
+
+            const alertItem =
+                document.createElement("div");
+
+            alertItem.className =
+                `alert-item ${alertClass}`;
+
+            alertItem.innerHTML = `
+                <strong>
+                    ${report.disaster_type || "Disaster Report"}
+                </strong>
+
+                <p>
+                    ${report.latitude !== null &&
+                      report.longitude !== null
+                        ? `${Number(report.latitude).toFixed(4)},
+                           ${Number(report.longitude).toFixed(4)}`
+                        : "Location unavailable"}
+                    • ${report.status || "Pending"}
+                </p>
+
+                <small>
+                    ${formatAlertTime(report.created_at)}
+                </small>
+            `;
+
+            alertsContainer.appendChild(alertItem);
+
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Recent alerts error:",
+            error
+        );
+
+        alertsContainer.innerHTML = `
+            <p class="text-danger text-center">
+                Unable to load alerts.
+            </p>
+        `;
+
+    }
+
+}
+function formatAlertTime(dateString) {
+
+    if (!dateString) {
+        return "Time unavailable";
+    }
+
+    const date =
+        new Date(dateString);
+
+    if (isNaN(date.getTime())) {
+        return "Recently";
+    }
+
+    const now =
+        new Date();
+
+    const difference =
+        Math.floor(
+            (now - date) / 60000
+        );
+
+    if (difference < 1) {
+        return "Just now";
+    }
+
+    if (difference < 60) {
+        return `${difference} mins ago`;
+    }
+
+    const hours =
+        Math.floor(difference / 60);
+
+    if (hours < 24) {
+        return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+    }
+
+    const days =
+        Math.floor(hours / 24);
+
+    return `${days} day${days === 1 ? "" : "s"} ago`;
+}
+loadRecentAlerts();
+function loadAIPredictionSummary() {
+
+    const body =
+        document.getElementById("aiPredictionBody");
+
+    if (!body) {
+        return;
+    }
+
+    const savedResult =
+        localStorage.getItem("latestAIResult");
+
+    if (!savedResult) {
+        return;
+    }
+
+    try {
+
+        const result =
+            JSON.parse(savedResult);
+
+        const prediction =
+            result.prediction || "Unknown";
+
+        const confidence =
+            result.confidence !== undefined
+                ? Number(result.confidence).toFixed(2)
+                : "-";
+
+        const risk =
+            result.risk || "Unknown";
+
+        let badgeClass = "bg-success";
+
+        if (risk.toLowerCase() === "high") {
+            badgeClass = "bg-danger";
+        } else if (risk.toLowerCase() === "medium") {
+            badgeClass = "bg-warning text-dark";
+        }
+
+        body.innerHTML = `
+
+            <tr>
+
+                <td>
+                    ${prediction}
+                </td>
+
+                <td>
+
+                    <span class="badge ${badgeClass}">
+                        ${confidence}% — ${risk}
+                    </span>
+
+                </td>
+
+            </tr>
+
+        `;
+
+    } catch (error) {
+
+        console.error(
+            "AI summary error:",
+            error
+        );
+
+    }
+}
+
+loadAIPredictionSummary();
+
+async function loadPlatformUsers() {
+
+    try {
+
+        const response =
+            await fetch("/api/platform-users");
+
+        const data =
+            await response.json();
+
+        if (data.success) {
+
+            document.getElementById("platformUsers").textContent =
+                data.users;
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Platform users error:",
+            error
+        );
+
+    }
+}
+
+loadPlatformUsers();
+async function loadRecentActivity() {
+
+    const activityContainer =
+        document.getElementById("recentActivity");
+
+    if (!activityContainer) {
+        return;
+    }
+
+    try {
+
+        const response =
+            await fetch("/reports/recent");
+
+        const data =
+            await response.json();
+
+        if (
+            !data.success ||
+            !data.reports ||
+            data.reports.length === 0
+        ) {
+
+            activityContainer.innerHTML = `
+                <p class="text-muted text-center">
+                    No recent activity.
+                </p>
+            `;
+
+            return;
+        }
+
+        activityContainer.innerHTML = "";
+
+        // Latest 5 reports
+        const reports =
+            data.reports.slice(0, 5);
+
+        reports.forEach(function(report) {
+
+            let icon = "bi-exclamation-lg";
+            let iconClass = "bg-warning";
+            let title = "Report Submitted";
+
+            if (report.status === "Verified") {
+
+                icon = "bi-check-lg";
+                iconClass = "bg-success";
+                title = "Report Verified";
+
+            } else if (report.status === "Rejected") {
+
+                icon = "bi-x-lg";
+                iconClass = "bg-danger";
+                title = "Report Rejected";
+            }
+
+            const activity =
+                document.createElement("div");
+
+            activity.className =
+                "timeline-item";
+
+            activity.innerHTML = `
+
+                <div class="timeline-icon ${iconClass}">
+
+                    <i class="bi ${icon}"></i>
+
+                </div>
+
+                <div>
+
+                    <h6>
+                        ${title}
+                    </h6>
+
+                    <p>
+                        Citizen report #${report.id}
+                        — ${report.disaster_type || "Disaster"}
+                    </p>
+
+                    <small>
+                        ${formatAlertTime(report.created_at)}
+                    </small>
+
+                </div>
+
+            `;
+
+            activityContainer.appendChild(activity);
+
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Recent activity error:",
+            error
+        );
+
+        activityContainer.innerHTML = `
+            <p class="text-danger text-center">
+                Unable to load recent activity.
+            </p>
+        `;
+
+    }
+}
+
+loadRecentActivity();
+</script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
 </html>

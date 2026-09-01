@@ -106,145 +106,162 @@ Join DIVYA AI and help build safer communities.
 
 </p>
 
-<form action="/register" method="POST">
+<form id="registerForm">
 
-<div class="row">
+    <div class="row">
 
-<div class="col-md-6 mb-3">
+        <div class="col-md-6 mb-3">
 
-<label>First Name</label>
+            <label>First Name</label>
 
-<input
-type="text"
-class="form-control"
-placeholder="First Name"
-name="firstname"
-required>
+            <input
+                type="text"
+                class="form-control"
+                placeholder="First Name"
+                name="firstname"
+                id="firstname"
+                required>
 
-</div>
+        </div>
 
-<div class="col-md-6 mb-3">
+        <div class="col-md-6 mb-3">
 
-<label>Last Name</label>
+            <label>Last Name</label>
 
-<input
-type="text"
-class="form-control"
-placeholder="Last Name"
-name="lastname"
-required>
+            <input
+                type="text"
+                class="form-control"
+                placeholder="Last Name"
+                name="lastname"
+                id="lastname"
+                required>
 
-</div>
+        </div>
 
-</div>
+    </div>
 
-<div class="mb-3">
 
-<label>Email Address</label>
+    <div class="mb-3">
 
-<input
-type="email"
-class="form-control"
-placeholder="Enter Email"
-name="email"
-required>
+        <label>Email Address</label>
 
-</div>
+        <input
+            type="email"
+            class="form-control"
+            placeholder="Enter Email"
+            name="email"
+            id="email"
+            required>
 
-<div class="row">
+    </div>
 
-<div class="col-md-6 mb-3">
 
-<label>Password</label>
+    <div class="row">
 
-<input
-type="password"
-class="form-control"
-placeholder="Create Password"
-name="password"
-required>
+        <div class="col-md-6 mb-3">
 
-</div>
+            <label>Password</label>
 
-<div class="col-md-6 mb-3">
+            <input
+                type="password"
+                class="form-control"
+                placeholder="Create Password"
+                name="password"
+                id="password"
+                required>
 
-<label>Confirm Password</label>
+        </div>
 
-<input
-type="password"
-class="form-control"
-placeholder="Confirm Password"
-name="confirm password"
-required>
+        <div class="col-md-6 mb-3">
 
-</div>
+            <label>Confirm Password</label>
 
-</div>
+            <input
+                type="password"
+                class="form-control"
+                placeholder="Confirm Password"
+                name="confirm_password"
+                id="confirm_password"
+                required>
 
-<div class="mb-3">
+        </div>
 
-<label>Phone Number</label>
+    </div>
 
-<input
-type="tel"
-class="form-control"
-placeholder="+91XXXXXXXXXX"
-name="tel"
-required>
 
-</div>
+    <div class="mb-3">
 
-<div class="mb-3">
+        <label>Phone Number</label>
 
-<label>Select Language</label>
+        <input
+            type="tel"
+            class="form-control"
+            placeholder="+91XXXXXXXXXX"
+            name="tel"
+            id="tel"
+            required>
 
-<select class="form-select">
+    </div>
 
-<option>English</option>
 
-<option>हिन्दी</option>
+    <div class="mb-3">
 
-</select>
+        <label>Select Language</label>
 
-</div>
+        <select
+            class="form-select"
+            name="language"
+            id="language">
 
-<div class="form-check mb-4">
+            <option value="en">English</option>
+            <option value="hi">हिन्दी</option>
 
-<input
-class="form-check-input"
-type="checkbox"
-id="terms">
+        </select>
 
-<label
-class="form-check-label"
-for="terms">
+    </div>
 
-I agree to the Terms & Conditions
 
-</label>
+    <div class="form-check mb-4">
 
-</div>
+        <input
+            class="form-check-input"
+            type="checkbox"
+            id="terms"
+            required>
 
-<button
-class="btn btn-warning w-100 py-2">
+        <label
+            class="form-check-label"
+            for="terms">
 
-<i class="bi bi-person-plus-fill"></i>
+            I agree to the Terms & Conditions
 
-Create Account
+        </label>
 
-</button>
+    </div>
 
-<p class="text-center mt-4">
 
-Already have an account?
+    <button
+        type="submit"
+        class="btn btn-warning w-100 py-2">
 
-<a href="{{ url_for('login') }}">
+        <i class="bi bi-person-plus-fill"></i>
 
-Login
+        Create Account
 
-</a>
+    </button>
 
-</p>
+
+    <p class="text-center mt-4">
+
+        Already have an account?
+
+        <a href="{{ url_for('login_page') }}">
+
+            Login
+
+        </a>
+
+    </p>
 
 </form>
 
@@ -262,6 +279,78 @@ Login
 
 <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 
+<script>
+
+document.getElementById("registerForm").addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const firstName = document.getElementById("firstname").value.trim();
+    const lastName = document.getElementById("lastname").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    const confirmPassword = document.getElementById("confirm_password").value;
+    const language = document.getElementById("language").value;
+
+    // Check password confirmation
+    if (password !== confirmPassword) {
+
+        alert("Passwords do not match.");
+
+        return;
+
+    }
+
+    const fullName = `${firstName} ${lastName}`.trim();
+
+    try {
+
+        const response = await fetch("/register", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+
+                full_name: fullName,
+                email: email,
+                password: password,
+                language: language
+
+            })
+
+        });
+
+
+        const result = await response.json();
+
+
+        if (result.success) {
+
+            alert(result.message || "Registration successful!");
+
+            window.location.href = "/login";
+
+        } else {
+
+            alert(result.message || "Registration failed.");
+
+        }
+
+    } catch (error) {
+
+        console.error("Registration error:", error);
+
+        alert("Unable to connect to the server.");
+
+    }
+
+});
+
+</script>
 </body>
 
 </html>

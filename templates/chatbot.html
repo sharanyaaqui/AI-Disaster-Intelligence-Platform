@@ -43,14 +43,17 @@ href="{{ url_for('static', filename='css/style.css') }}">
 
             <li><a href="{{ url_for('dashboard') }}"><i class="bi bi-grid-fill"></i> Dashboard</a></li>
 
-            <li><a href="{{ url_for('report') }}"><i class="bi bi-exclamation-triangle-fill"></i> Report Incident</a></li>
+            <li><a href="{{ url_for('report_page') }}"><i class="bi bi-exclamation-triangle-fill"></i> Report Incident</a></li>
 
-            <li><a class="active" href="{{ url_for('chatbot') }}"><i class="bi bi-robot"></i> Ask DIVYA</a></li>
+            <li><a class="active" href="{{ url_for('chatbot_page') }}"><i class="bi bi-robot"></i> Ask DIVYA</a></li>
 
-            <li><a href="#"><i class="bi bi-shield-check"></i> Safety Guidance</a></li>
-
-            <li><a href="#"><i class="bi bi-person-circle"></i> Profile</a></li>
-
+            <li><a href="{{ url_for('recommendation') }}"><i class="bi bi-shield-check"></i> Safety Guidance</a></li>
+            
+            <li><a href="{{ url_for('offline') }}"><i class="bi bi-wifi-off"></i> Offline Resources</a></li>
+            
+            <li><a href="{{ url_for('profile') }}"><i class="bi bi-person-circle"></i> Profile</a></li>
+            
+            
         </ul>
 
     </div>
@@ -73,7 +76,7 @@ href="{{ url_for('static', filename='css/style.css') }}">
 
             <div class="dashboard-card">
 
-                <div class="chat-window">
+                <div class="chat-window" id="chatMessages">
 
                     <div class="bot-chat">
 
@@ -156,26 +159,91 @@ href="{{ url_for('static', filename='css/style.css') }}">
                         </div>
 
                     </div>
+         <!-- ================================= -->
+    <!-- DYNAMIC CHAT RESPONSE - STEP 4 -->
+    <!-- ================================= -->
+
+    {% if user_message %}
+
+    <div class="user-chat">
+
+        <div class="chat-bubble user">
+
+            {{ user_message }}
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+
+    {% if bot_response %}
+
+    <div class="bot-chat">
+
+        <img
+            src="{{ url_for('static', filename='images/divya-logo.png') }}"
+            class="chat-avatar"
+        >
+
+        <div class="chat-bubble bot">
+
+            <strong>DIVYA AI</strong>
+
+            <p>
+                {{ bot_response | safe }}
+            </p>
+
+        </div>
+
+    </div>
+
+    {% endif %}
 
                 </div>
 
                 <!-- Input -->
-<form action="/chatbot" method="POST">
+
+<!-- Chat Input -->
+
+<form
+    id="chatForm"
+    action="/chatbot"
+    method="POST"
+>
+
+    <input
+        type="hidden"
+        name="latitude"
+        id="chatLatitude"
+    >
+
+    <input
+        type="hidden"
+        name="longitude"
+        id="chatLongitude"
+    >
 
     <div class="chat-input mt-4">
 
         <div class="input-group">
 
             <input
-            type="text"
-            class="form-control"
-            name="message"
-            placeholder="Ask DIVYA anything..."
-            required>
+                type="text"
+                class="form-control"
+                name="message"
+                id="chatMessage"
+                placeholder="Ask DIVYA anything..."
+                autocomplete="off"
+                required
+            >
 
             <button
-            type="submit"
-            class="btn btn-warning">
+                type="button"
+                class="btn btn-warning"
+                onclick="sendChatMessage()"
+            >
 
                 <i class="bi bi-send-fill"></i>
 
@@ -199,35 +267,30 @@ href="{{ url_for('static', filename='css/style.css') }}">
 
                 <div class="mt-3">
 
-                    <button class="btn btn-outline-warning m-2">
+                    <button class="suggestion-chip"
+        data-prompt="How can I stay safe during floods?">
+    Flood Safety
+</button>
 
-                        Flood Safety
+                    <button class="suggestion-chip"
+        data-prompt="What do i do during an eathquake?">
+    Earthquake Tips
+</button>
 
-                    </button>
+                    <button class="suggestion-chip"
+        data-prompt="Show Emergency contacts">
+    Emergency Numbers
+</button>
 
-                    <button class="btn btn-outline-warning m-2">
+                    <button class="suggestion-chip"
+        data-prompt="Where can i find shelter?">
+    Nearby Shelters
+</button>
 
-                        Earthquake Tips
-
-                    </button>
-
-                    <button class="btn btn-outline-warning m-2">
-
-                        Emergency Numbers
-
-                    </button>
-
-                    <button class="btn btn-outline-warning m-2">
-
-                        Nearby Shelters
-
-                    </button>
-
-                    <button class="btn btn-outline-warning m-2">
-
-                        First Aid
-
-                    </button>
+                    <button class="suggestion-chip"
+        data-prompt="I need First Aid">
+    First Aid
+</button>
 
                 </div>
 
@@ -239,8 +302,243 @@ href="{{ url_for('static', filename='css/style.css') }}">
 
 </div>
 
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const latitudeField =
+        document.getElementById("chatLatitude");
+
+    const longitudeField =
+        document.getElementById("chatLongitude");
+
+
+    if (!latitudeField || !longitudeField) {
+
+        console.error(
+            "Chat location fields not found."
+        );
+
+        return;
+    }
+
+
+    if (!navigator.geolocation) {
+
+        console.error(
+            "Geolocation is not supported."
+        );
+
+        return;
+    }
+
+
+    navigator.geolocation.getCurrentPosition(
+
+        function (position) {
+
+            latitudeField.value =
+                position.coords.latitude;
+
+            longitudeField.value =
+                position.coords.longitude;
+
+
+            console.log(
+                "CHAT LOCATION SET:"
+            );
+
+            console.log(
+                "Latitude:",
+                latitudeField.value
+            );
+
+            console.log(
+                "Longitude:",
+                longitudeField.value
+            );
+
+        },
+
+        function (error) {
+
+            console.error(
+                "LOCATION ERROR:",
+                error.message
+            );
+
+        }
+
+    );
+
+});
+
+</script>
 <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 
+
+<script>
+
+async function sendChatMessage() {
+
+    console.log("SEND BUTTON CLICKED");
+
+
+    const form =
+        document.getElementById("chatForm");
+
+    const message =
+        document.getElementById("chatMessage");
+
+    const latitude =
+        document.getElementById("chatLatitude");
+
+    const longitude =
+        document.getElementById("chatLongitude");
+
+
+    if (!message.value.trim()) {
+
+        alert("Please enter a question.");
+
+        return;
+    }
+
+
+    // If location hasn't loaded yet,
+    // request it before submitting.
+
+    if (
+        !latitude.value ||
+        !longitude.value
+    ) {
+
+        console.log(
+            "Location not available yet. Requesting location..."
+        );
+
+
+        if (!navigator.geolocation) {
+
+            alert(
+                "Your browser does not support location."
+            );
+
+            return;
+        }
+
+
+        navigator.geolocation.getCurrentPosition(
+
+            function (position) {
+
+                latitude.value =
+                    position.coords.latitude;
+
+                longitude.value =
+                    position.coords.longitude;
+
+
+                console.log(
+                    "LOCATION OBTAINED BEFORE SEND"
+                );
+
+                console.log(
+                    "Latitude:",
+                    latitude.value
+                );
+
+                console.log(
+                    "Longitude:",
+                    longitude.value
+                );
+
+
+                form.submit();
+
+            },
+
+            function (error) {
+
+                console.error(
+                    "LOCATION ERROR:",
+                    error
+                );
+
+                alert(
+                    "Please allow location access so DIVYA can provide local weather information."
+                );
+
+            }
+
+        );
+
+
+        return;
+    }
+
+
+    console.log(
+        "LOCATION ALREADY AVAILABLE"
+    );
+
+    console.log(
+        "Latitude:",
+        latitude.value
+    );
+
+    console.log(
+        "Longitude:",
+        longitude.value
+    );
+
+
+    form.submit();
+
+}
+
+</script>
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const suggestionButtons =
+        document.querySelectorAll(".suggestion-chip");
+
+    const messageInput =
+        document.getElementById("chatMessage");
+
+
+    suggestionButtons.forEach(function (button) {
+
+        button.addEventListener("click", function () {
+
+            const prompt =
+                button.getAttribute("data-prompt");
+
+            if (!prompt) {
+                return;
+            }
+
+            console.log(
+                "Suggested question selected:",
+                prompt
+            );
+
+            // Put the suggested question
+            // into the chat input
+            messageInput.value = prompt;
+
+            // Send it automatically
+            sendChatMessage();
+
+        });
+
+    });
+
+});
+
+</script>
 </body>
 
 </html>

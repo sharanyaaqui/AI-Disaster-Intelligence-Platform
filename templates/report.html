@@ -41,15 +41,17 @@ DIVYA <span class="text-warning">AI</span>
 
 <ul class="nav flex-column">
 
-<li><a href="dashboard.html"><i class="bi bi-grid-fill"></i> Dashboard</a></li>
+<li><a href="{{ url_for('dashboard') }}"><i class="bi bi-grid-fill"></i> Dashboard</a></li>
 
-<li><a class="active" href="report.html"><i class="bi bi-exclamation-triangle-fill"></i> Report Incident</a></li>
+<li><a class="active" href="{{ url_for('report_page') }}"><i class="bi bi-exclamation-triangle-fill"></i> Report Incident</a></li>
 
-<li><a href="chatbot.html"><i class="bi bi-robot"></i> Ask DIVYA</a></li>
+<li><a href="{{ url_for('chatbot_page') }}"><i class="bi bi-robot"></i> Ask DIVYA</a></li>
 
-<li><a href="#"><i class="bi bi-shield-check"></i> Safety Guidance</a></li>
+<li><a href="{{ url_for('recommendation') }}"><i class="bi bi-shield-check"></i> Safety Guidance</a></li>
 
-<li><a href="#"><i class="bi bi-person-circle"></i> Profile</a></li>
+<li><a href="{{ url_for('offline') }}"><i class="bi bi-wifi-off"></i> Offline Resources</a></li>
+
+<li><a href="{{ url_for('profile') }}"><i class="bi bi-person-circle"></i> Profile</a></li>
 
 </ul>
 
@@ -69,175 +71,255 @@ DIVYA <span class="text-warning">AI</span>
 
 <div class="dashboard-card">
 
-<form>
+    <div id="reportSuccess"
+     class="alert alert-success"
+     style="display: none;">
+</div>
 
-<div class="row">
+<form id="reportForm"
+      action="/report"
+      method="POST"
+      enctype="multipart/form-data">
+         <!-- Hidden values used by the backend -->
 
-<!-- LEFT -->
+    <input type="hidden" name="user_id" id="user_id">
 
-<div class="col-lg-7">
+    <input type="hidden" name="latitude" id="latitude">
 
-<div class="mb-4">
+    <input type="hidden" name="longitude" id="longitude"> 
+    <div class="row">
 
-<label class="form-label">
+        <!-- LEFT -->
 
-Incident Type
+        <div class="col-lg-7">
 
-</label>
+            <div class="mb-4">
 
-<select class="form-select">
+                <label class="form-label">
+                    Incident Type
+                </label>
 
-<option>Select Incident</option>
+                <select
+                    class="form-select"
+                    name="disaster_type"
+                    required>
 
-<option>Flood</option>
+                    <option value="" selected disabled>
+                        Select Incident
+                    </option>
 
-<option>Fire</option>
+                    <option value="Flood">Flood</option>
+                    <option value="Fire">Fire</option>
+                    <option value="Earthquake">Earthquake</option>
+                    <option value="Landslide">Landslide</option>
+                    <option value="Cyclone">Cyclone</option>
+                    <option value="Road Damage">Road Damage</option>
+                    <option value="Building Collapse">
+                        Building Collapse
+                    </option>
+                    <option value="Other">Other</option>
 
-<option>Earthquake</option>
+                </select>
 
-<option>Landslide</option>
+            </div>
 
-<option>Cyclone</option>
 
-<option>Road Damage</option>
+            <div class="mb-4">
 
-<option>Building Collapse</option>
+                <label class="form-label">
+                    Description
+                </label>
 
-<option>Other</option>
+                <textarea
+                    class="form-control"
+                    name="description"
+                    rows="6"
+                    placeholder="Describe what happened..."
+                    required></textarea>
 
-</select>
+            </div>
+
+
+            <div class="mb-4">
+
+                <label class="form-label">
+                    Location
+                </label>
+
+                <input
+                    type="text"
+                    class="form-control"
+                    name="location"
+                    placeholder="Enter Location"
+                    required>
+
+            </div>
+
+
+            <div class="row">
+
+                <div class="col-md-6 mb-4">
+
+                    <label>Date</label>
+
+                    <input
+                        type="date"
+                        class="form-control"
+                        name="date"
+                        required>
+
+                </div>
+
+
+                <div class="col-md-6 mb-4">
+
+                    <label>Time</label>
+
+                    <input
+                        type="time"
+                        class="form-control"
+                        name="time"
+                        required>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- RIGHT -->
+
+        <div class="col-lg-5">
+
+            <div class="upload-box">
+
+                <i class="bi bi-cloud-arrow-up-fill"></i>
+
+                <h5>
+                    Upload Image
+                </h5>
+
+                <p>
+                    PNG, JPG or JPEG
+                </p>
+
+                <input
+                    type="file"
+                    class="form-control"
+                    name="image"
+                    accept="image/*">
+
+            </div>
+
+
+            <div class="mt-4">
+
+                <label>
+                    Severity
+                </label>
+
+                <select
+                    class="form-select"
+                    name="severity"
+                    required>
+
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="High">High</option>
+                    <option value="Critical">Critical</option>
+
+                </select>
+
+            </div>
+
+
+            <!-- ANALYZE -->
+
+            <div class="mt-4">
+
+                <button
+                  type="button"
+                  id="analyzeAI"
+                  class="btn btn-success w-100">
+
+                 <i class="bi bi-cpu-fill"></i>
+
+                   Analyze using AI
+
+                </button>
+
+            </div>
+            <div id="aiResult"
+     class="dashboard-card mt-4"
+     style="display: none;">
+
+    <h4 class="mb-3">
+        <i class="bi bi-robot"></i>
+        DIVYA AI Analysis
+    </h4>
+
+    <div class="row">
+
+        <div class="col-md-6 mb-3">
+            <strong>Prediction</strong>
+            <p id="aiPrediction">-</p>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <strong>Confidence</strong>
+            <p id="aiConfidence">-</p>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <strong>Risk Level</strong>
+            <p id="aiRisk">-</p>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <strong>Emergency Level</strong>
+            <p id="aiEmergency">-</p>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <strong>Response Time</strong>
+            <p id="aiResponseTime">-</p>
+        </div>
+
+    </div>
+
+    <hr>
+
+    <h5>Recommended Actions</h5>
+
+    <ul id="aiActions"></ul>
 
 </div>
 
-<div class="mb-4">
+    <ul id="aiActions"></ul>
 
-<label class="form-label">
+        </div>
+            <!-- SUBMIT -->
 
-Description
+            <div class="mt-3">
 
-</label>
+                <button
+                    type="submit"
+                    name="action"
+                    value="submit"
+                    class="btn btn-success w-100">
 
-<textarea
-class="form-control"
-rows="6"
-placeholder="Describe what happened..."></textarea>
+                    <i class="bi bi-send-fill"></i>
 
-</div>
+                    Submit Report
 
-<div class="mb-4">
+                </button>
 
-<label class="form-label">
+            </div>
 
-Location
+        </div>
 
-</label>
-
-<input
-type="text"
-class="form-control"
-placeholder="Enter Location">
-
-</div>
-
-<div class="row">
-
-<div class="col-md-6 mb-4">
-
-<label>Date</label>
-
-<input
-type="date"
-class="form-control">
-
-</div>
-
-<div class="col-md-6 mb-4">
-
-<label>Time</label>
-
-<input
-type="time"
-class="form-control">
-
-</div>
-
-</div>
-
-</div>
-
-<!-- RIGHT -->
-
-<div class="col-lg-5">
-
-<div class="upload-box">
-
-<i class="bi bi-cloud-arrow-up-fill"></i>
-
-<h5>
-
-Upload Image
-
-</h5>
-
-<p>
-
-PNG, JPG or JPEG
-
-</p>
-
-<input
-type="file"
-class="form-control">
-
-</div>
-
-<div class="mt-4">
-
-<label>Severity</label>
-
-<select class="form-select">
-
-<option>Low</option>
-
-<option>Medium</option>
-
-<option>High</option>
-
-<option>Critical</option>
-
-</select>
-
-</div>
-
-<div class="mt-4">
-
-<button
-class="btn btn-warning w-100">
-
-<i class="bi bi-cpu-fill"></i>
-
-Analyze using AI
-
-</button>
-
-</div>
-
-<div class="mt-3">
-
-<button
-class="btn btn-success w-100">
-
-<i class="bi bi-send-fill"></i>
-
-Submit Report
-
-</button>
-
-</div>
-
-</div>
-
-</div>
+    </div>
 
 </form>
 
@@ -265,11 +347,7 @@ Disaster Type
 
 </h6>
 
-<h4>
-
-Flood
-
-</h4>
+<h3 id="aiDisasterType">-</h3>
 
 </div>
 
@@ -285,11 +363,7 @@ Confidence
 
 </h6>
 
-<h4>
-
-96%
-
-</h4>
+<h3 id="aiConfidenceCard">-</h3>
 
 </div>
 
@@ -305,11 +379,7 @@ Risk Level
 
 </h6>
 
-<h4 class="text-danger">
-
-High
-
-</h4>
+<h3 id="aiRiskLevel">-</h3>
 
 </div>
 
@@ -325,11 +395,7 @@ Recommendation
 
 </h6>
 
-<h4>
-
-Evacuate
-
-</h4>
+<h3 id="aiRecommendation">-</h3>
 
 </div>
 
@@ -344,9 +410,617 @@ Evacuate
 </div>
 
 </div>
+<script>
 
-<script src="../static/js/script.js"></script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    /* =====================================================
+       USER ID + GPS LOCATION
+    ===================================================== */
+
+    const userIdField =
+        document.getElementById("user_id");
+
+    const latitudeField =
+        document.getElementById("latitude");
+
+    const longitudeField =
+        document.getElementById("longitude");
+
+    const userId =
+        localStorage.getItem("user_id");
+
+
+    if (userId && userIdField) {
+        userIdField.value = userId;
+    }
+
+
+    if (navigator.geolocation) {
+
+        navigator.geolocation.getCurrentPosition(
+
+            function (position) {
+
+                if (latitudeField) {
+                    latitudeField.value =
+                        position.coords.latitude;
+                }
+
+                if (longitudeField) {
+                    longitudeField.value =
+                        position.coords.longitude;
+                }
+
+                console.log(
+                    "User ID:",
+                    userIdField?.value
+                );
+
+                console.log(
+                    "Latitude:",
+                    latitudeField?.value
+                );
+
+                console.log(
+                    "Longitude:",
+                    longitudeField?.value
+                );
+
+            },
+
+            function (error) {
+
+                console.error(
+                    "Location error:",
+                    error
+                );
+
+                alert(
+                    "DIVYA AI needs your location to submit this report. " +
+                    "Please allow location access and try again."
+                );
+
+            }
+
+        );
+
+    } else {
+
+        alert(
+            "Geolocation is not supported by your browser."
+        );
+
+    }
+
+
+
+    /* =====================================================
+       FUNCTION: DISPLAY AI RESULT
+       Updates BOTH AI result sections immediately
+    ===================================================== */
+
+    function updateAIResult(result) {
+
+        console.log(
+            "Updating AI result on page:",
+            result
+        );
+
+
+        /* ---------------------------------------------
+           SUMMARY CARDS
+        --------------------------------------------- */
+
+
+        // Disaster Type
+
+        const disasterType =
+            document.getElementById(
+                "aiDisasterType"
+            );
+
+        if (disasterType) {
+
+            disasterType.textContent =
+                result.prediction || "-";
+
+        }
+
+
+        // Confidence
+
+        const confidenceCard =
+            document.getElementById(
+                "aiConfidenceCard"
+            );
+
+        if (confidenceCard) {
+
+            if (
+                result.confidence !== null &&
+                result.confidence !== undefined
+            ) {
+
+                confidenceCard.textContent =
+                    result.confidence + "%";
+
+            } else {
+
+                confidenceCard.textContent =
+                    "N/A";
+
+            }
+
+        }
+
+
+        // Risk Level
+
+        const riskLevel =
+            document.getElementById(
+                "aiRiskLevel"
+            );
+
+        if (riskLevel) {
+
+            riskLevel.textContent =
+                result.risk || "-";
+
+        }
+
+
+        // Recommendation
+
+        const recommendation =
+            document.getElementById(
+                "aiRecommendation"
+            );
+
+        if (recommendation) {
+
+            if (
+                Array.isArray(result.actions) &&
+                result.actions.length > 0
+            ) {
+
+                recommendation.textContent =
+                    result.actions[0];
+
+            } else {
+
+                recommendation.textContent =
+                    "-";
+
+            }
+
+        }
+
+
+
+        /* ---------------------------------------------
+           DETAILED AI RESULT
+        --------------------------------------------- */
+
+
+        // Prediction
+
+        const aiPrediction =
+            document.getElementById(
+                "aiPrediction"
+            );
+
+        if (aiPrediction) {
+
+            aiPrediction.textContent =
+                result.prediction || "-";
+
+        }
+
+
+        // Confidence
+
+        const aiConfidence =
+            document.getElementById(
+                "aiConfidence"
+            );
+
+        if (aiConfidence) {
+
+            if (
+                result.confidence !== null &&
+                result.confidence !== undefined
+            ) {
+
+                aiConfidence.textContent =
+                    result.confidence + "%";
+
+            } else {
+
+                aiConfidence.textContent =
+                    "N/A";
+
+            }
+
+        }
+
+
+        // Risk
+
+        const aiRisk =
+            document.getElementById(
+                "aiRisk"
+            );
+
+        if (aiRisk) {
+
+            aiRisk.textContent =
+                result.risk || "-";
+
+        }
+
+
+        // Emergency Level
+
+        const aiEmergency =
+            document.getElementById(
+                "aiEmergency"
+            );
+
+        if (aiEmergency) {
+
+            aiEmergency.textContent =
+                result.emergency_level || "-";
+
+        }
+
+
+        // Response Time
+
+        const aiResponseTime =
+            document.getElementById(
+                "aiResponseTime"
+            );
+
+        if (aiResponseTime) {
+
+            aiResponseTime.textContent =
+                result.response_time || "-";
+
+        }
+
+
+
+        /* ---------------------------------------------
+           RECOMMENDED ACTIONS
+        --------------------------------------------- */
+
+
+        const actionsList =
+            document.getElementById(
+                "aiActions"
+            );
+
+
+        if (actionsList) {
+
+            actionsList.innerHTML = "";
+
+
+            if (
+                Array.isArray(result.actions)
+            ) {
+
+                result.actions.forEach(
+                    function (action) {
+
+                        const li =
+                            document.createElement(
+                                "li"
+                            );
+
+                        li.textContent =
+                            action;
+
+                        actionsList.appendChild(
+                            li
+                        );
+
+                    }
+                );
+
+            }
+
+        }
+
+
+        console.log(
+            "AI RESULT DISPLAYED SUCCESSFULLY"
+        );
+
+    }
+
+
+
+    /* =====================================================
+       AI ANALYSIS BUTTON
+    ===================================================== */
+
+    const analyzeButton =
+        document.getElementById(
+            "analyzeAI"
+        );
+
+
+    if (!analyzeButton) {
+
+        console.error(
+            "Analyze AI button not found."
+        );
+
+        return;
+
+    }
+
+
+    analyzeButton.addEventListener(
+        "click",
+        async function () {
+
+            console.log(
+                "AI BUTTON CLICKED"
+            );
+
+
+            /* ---------------------------------------------
+               IMAGE
+            --------------------------------------------- */
+
+            const imageInput =
+                document.querySelector(
+                    'input[name="image"]'
+                );
+
+
+            if (
+                !imageInput ||
+                imageInput.files.length === 0
+            ) {
+
+                alert(
+                    "Please upload an image first."
+                );
+
+                return;
+
+            }
+
+
+            const image =
+                imageInput.files[0];
+
+
+
+            /* ---------------------------------------------
+               RESULT BOX
+            --------------------------------------------- */
+
+            const resultBox =
+                document.getElementById(
+                    "aiResult"
+                );
+
+
+            if (resultBox) {
+
+                resultBox.style.display =
+                    "block";
+
+            }
+
+
+
+            /* ---------------------------------------------
+               FORM DATA
+            --------------------------------------------- */
+
+            const formData =
+                new FormData();
+
+
+            formData.append(
+                "image",
+                image
+            );
+
+
+            /* ---------------------------------------------
+               INCIDENT TYPE
+            --------------------------------------------- */
+
+            const disasterType =
+                document.querySelector(
+                    'select[name="disaster_type"]'
+                );
+
+
+            if (
+                !disasterType ||
+                !disasterType.value
+            ) {
+
+                alert(
+                    "Please select an incident type."
+                );
+
+                return;
+
+            }
+
+
+            formData.append(
+                "disaster_type",
+                disasterType.value
+            );
+
+
+            console.log(
+                "Incident Type:",
+                disasterType.value
+            );
+
+
+
+            /* ---------------------------------------------
+               SEND TO FLASK
+            --------------------------------------------- */
+
+            try {
+
+                console.log(
+                    "Sending image to /predict..."
+                );
+
+
+                const response =
+                    await fetch(
+                        "/predict",
+                        {
+                            method: "POST",
+                            body: formData
+                        }
+                    );
+
+
+                console.log(
+                    "AI response status:",
+                    response.status
+                );
+
+
+                const data =
+                    await response.json();
+
+
+                console.log(
+                    "FULL AI RESPONSE:",
+                    data
+                );
+
+
+                /* -----------------------------------------
+                   CHECK RESPONSE
+                ----------------------------------------- */
+
+                if (!data.success) {
+
+                    alert(
+                        data.message ||
+                        "AI analysis failed."
+                    );
+
+                    return;
+
+                }
+
+
+                /* -----------------------------------------
+                   GET RESULT
+                ----------------------------------------- */
+
+                const result =
+                    data.result;
+
+
+                console.log(
+                    "AI RESULT:",
+                    result
+                );
+
+
+                /* -----------------------------------------
+                   SAVE RESULT
+                ----------------------------------------- */
+
+                localStorage.setItem(
+                    "latestAIResult",
+                    JSON.stringify(result)
+                );
+
+
+                /* -----------------------------------------
+                   UPDATE PAGE IMMEDIATELY
+                ----------------------------------------- */
+
+                updateAIResult(
+                    result
+                );
+
+            }
+
+
+            catch (error) {
+
+                console.error(
+                    "AI prediction error:",
+                    error
+                );
+
+
+                alert(
+                    "Unable to connect to the AI service."
+                );
+
+            }
+
+        }
+    );
+
+
+
+    /* =====================================================
+       LOAD LAST AI RESULT
+       This is ONLY for page refresh/reopening
+    ===================================================== */
+
+    const savedResult =
+        localStorage.getItem(
+            "latestAIResult"
+        );
+
+
+    if (savedResult) {
+
+        try {
+
+            const result =
+                JSON.parse(
+                    savedResult
+                );
+
+
+            updateAIResult(
+                result
+            );
+
+
+        }
+
+        catch (error) {
+
+            console.error(
+                "Unable to load saved AI result:",
+                error
+            );
+
+        }
+
+    }
+
+});
+
+</script>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
 
 </body>
-
 </html>

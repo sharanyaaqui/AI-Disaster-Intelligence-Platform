@@ -1411,3 +1411,13 @@ textarea{
 }
 
 }
+.action-card {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.action-card:hover {
+    text-decoration: none;
+    color: inherit;
+}
