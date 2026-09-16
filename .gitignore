@@ -8,3 +8,4 @@ __pycache__/
 certs/
 .env
 pmtiles.exe
+static/maps/up.pmtiles
