@@ -33,6 +33,12 @@ class User(db.Model):
         nullable=False
     )
 
+    vulnerabilities = db.Column(
+    db.Text,
+    default="[]",
+    nullable=False
+    )
+
     role = db.Column(
         db.String(20),
         default="citizen",

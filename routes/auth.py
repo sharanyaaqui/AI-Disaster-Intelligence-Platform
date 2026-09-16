@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify , session
 from werkzeug.security import generate_password_hash, check_password_hash
 from utils.translation_service import translate
 from database.db import db
@@ -106,6 +106,8 @@ def login():
         }), 401
 
     # Login successful
+    session["user_id"] = user.id
+    session["language"] = user.preferred_language
     return jsonify({
         "success": True,
         "message": translate("login_success", language),

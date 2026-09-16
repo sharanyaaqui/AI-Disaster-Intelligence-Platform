@@ -867,10 +867,6 @@
 
 <script src="{{ url_for('static', filename='js/offline.js') }}"></script>
 
-<script src="{{ url_for('static', filename='js/script.js') }}"></script>
-
-<script src="{{ url_for('static', filename='js/offline.js') }}"></script>
-
 <script>
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -912,6 +908,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let facilityList = [];
 
+    let nearbyFacilities = [];
 
     /* ==========================================
        CHECK MAP LIBRARIES
@@ -970,9 +967,9 @@ document.addEventListener("DOMContentLoaded", function () {
             type: "vector",
 
             url:
-                "pmtiles://" +
-                window.location.origin +
-                "{{ url_for('static', filename='maps/up.pmtiles') }}"
+              "pmtiles://" +
+               window.location.origin +
+             "{{ url_for('static', filename='maps/up.pmtiles') }}"
 
         }
 
@@ -1207,51 +1204,44 @@ async function loadPreloadedUPFacilities() {
             "Loading Uttar Pradesh emergency facilities...";
 
         const response = await fetch(
-            "/static/data/up_emergency_facilities.json"
+            "/static/data/northern_zone_emergency_facilities.json"
         );
 
         if (!response.ok) {
-
             throw new Error(
                 "Could not load UP facility dataset."
             );
-
         }
 
-        const data =
-            await response.json();
+        const data = await response.json();
 
         if (
             !data.facilities ||
             !Array.isArray(data.facilities)
         ) {
-
             throw new Error(
                 "Invalid facility dataset."
             );
-
         }
 
-        clearFacilityMarkers();
+        /*
+         * Store the complete dataset in memory.
+         * DO NOT create markers here.
+         * DO NOT display the complete list here.
+         */
 
-        facilityList = [];
+        facilityList = data.facilities
+            .filter(function (facility) {
 
-        data.facilities.forEach(
-            function (facility) {
+                return (
+                    typeof facility.latitude === "number" &&
+                    typeof facility.longitude === "number"
+                );
 
-                if (
-                    typeof facility.latitude !== "number" ||
-                    typeof facility.longitude !== "number"
-                ) {
-                    return;
-                }
+            })
+            .map(function (facility) {
 
-                const marker =
-                    createFacilityMarker(
-                        facility
-                    );
-
-                facilityList.push({
+                return {
 
                     name:
                         facility.name ||
@@ -1269,26 +1259,19 @@ async function loadPreloadedUPFacilities() {
                         facility.latitude,
 
                     longitude:
-                        facility.longitude,
+                        facility.longitude
 
-                    marker:
-                        marker
+                };
 
-                });
-
-            }
-        );
-
-        displayFacilityList();
-
-        status.textContent =
-            facilityList.length +
-            " emergency facilities loaded for Uttar Pradesh.";
+            });
 
         console.log(
-            "Preloaded UP facilities:",
+            "Emergency facilities loaded:",
             facilityList.length
         );
+
+        status.textContent =
+            "Emergency facility database ready. Waiting for your location.";
 
     }
 
@@ -1300,7 +1283,7 @@ async function loadPreloadedUPFacilities() {
         );
 
         status.textContent =
-            "Unable to load preloaded UP emergency facilities.";
+            "Unable to load emergency facility database.";
 
     }
 
@@ -1433,101 +1416,65 @@ async function loadPreloadedUPFacilities() {
 
     function loadSavedFacilities() {
 
-        const saved =
-            localStorage.getItem(
-                "divya_emergency_facilities"
-            );
+    const saved =
+        localStorage.getItem(
+            "divya_emergency_facilities"
+        );
 
+    if (!saved) {
+        return false;
+    }
 
-        if (!saved) {
+    try {
 
+        const data =
+            JSON.parse(saved);
+
+        if (
+            !data.facilities ||
+            !Array.isArray(data.facilities)
+        ) {
             return false;
-
         }
 
+        /*
+         * Store facilities in memory only.
+         * DO NOT create markers for all facilities.
+         */
 
-        try {
+        facilityList = data.facilities.map(
+            function (facility) {
 
-            const data =
-                JSON.parse(saved);
-
-
-            if (
-                !data.facilities ||
-                !Array.isArray(
-                    data.facilities
-                )
-            ) {
-
-                return false;
+                return {
+                    name: facility.name,
+                    type: facility.type,
+                    icon: facility.icon,
+                    latitude: Number(facility.latitude),
+                    longitude: Number(facility.longitude)
+                };
 
             }
+        );
 
+        console.log(
+            "Saved emergency facilities loaded:",
+            facilityList.length
+        );
 
-            clearFacilityMarkers();
-
-
-            facilityList = [];
-
-
-            data.facilities.forEach(
-                function (facility) {
-
-                    const marker =
-                        createFacilityMarker(
-                            facility
-                        );
-
-
-                    facilityList.push({
-
-                        name:
-                            facility.name,
-
-                        type:
-                            facility.type,
-
-                        icon:
-                            facility.icon,
-
-                        latitude:
-                            facility.latitude,
-
-                        longitude:
-                            facility.longitude,
-
-                        marker:
-                            marker
-
-                    });
-
-                }
-            );
-
-
-            displayFacilityList();
-
-
-            status.textContent =
-                "Offline mode: showing previously saved emergency facilities.";
-
-
-            return true;
-
-        }
-
-        catch (error) {
-
-            console.error(
-                "Saved facility error:",
-                error
-            );
-
-            return false;
-
-        }
+        return true;
 
     }
+    catch (error) {
+
+        console.error(
+            "Saved facility error:",
+            error
+        );
+
+        return false;
+
+    }
+}
 
 
     /* ==========================================
@@ -1589,826 +1536,586 @@ async function loadPreloadedUPFacilities() {
        DISPLAY FACILITY LIST
     ========================================== */
 
-    function displayFacilityList() {
+    function displayFacilityList(facilities) {
 
-        if (!facilitiesContainer) {
+    if (!facilitiesContainer) {
+        return;
+    }
 
-            return;
+    if (
+        !facilities ||
+        facilities.length === 0
+    ) {
 
-        }
+        facilitiesContainer.innerHTML = `
+            <div class="alert alert-warning">
+                No nearby emergency facilities found.
+            </div>
+        `;
+
+        return;
+    }
 
 
-        if (
-            facilityList.length ===
-            0
-        ) {
+    let html = `
 
-            facilitiesContainer.innerHTML = `
+        <h5 class="mb-3">
+            🚨 Nearby Emergency Facilities
+        </h5>
 
-                <div class="alert alert-warning">
+        <div class="row">
 
-                    No emergency facilities
-                    are currently saved.
+    `;
+
+
+    facilities.forEach(
+        function (facility, index) {
+
+            html += `
+
+                <div class="col-md-4 mb-3">
+
+                    <button
+                        type="button"
+                        class="
+                            btn
+                            btn-outline-warning
+                            w-100
+                            text-start
+                            facility-button
+                        "
+                        data-index="${index}"
+                    >
+
+                        <strong>
+                            ${facility.icon || "📍"}
+                            ${facility.name || "Unnamed facility"}
+                        </strong>
+
+                        <br>
+
+                        <small>
+                            ${facility.type || "Emergency Facility"}
+                            <br>
+                            📏 ${facility.distance.toFixed(2)} km away
+                        </small>
+
+                    </button>
 
                 </div>
 
             `;
 
-            return;
-
         }
+    );
 
 
-        let html = `
+    html += `
 
-            <h5 class="mb-3">
+        </div>
 
-                🚨 Nearby Emergency Facilities
-
-            </h5>
-
-            <div class="row">
-
-        `;
+    `;
 
 
-        facilityList.forEach(
-            function (
-                facility,
-                index
-            ) {
+    facilitiesContainer.innerHTML = html;
 
-                html += `
 
-                    <div
-                        class="col-md-4 mb-3"
-                    >
+    facilitiesContainer
+        .querySelectorAll(".facility-button")
+        .forEach(
+            function (button) {
 
-                        <button
+                button.addEventListener(
+                    "click",
+                    function () {
 
-                            type="button"
+                        const index =
+                            Number(
+                                this.dataset.index
+                            );
 
-                            class="
-                                btn
-                                btn-outline-warning
-                                w-100
-                                text-start
-                                facility-button
-                            "
+                        const facility =
+                            facilities[index];
 
-                            data-index="${index}"
-                        >
+                        if (!facility) {
+                            return;
+                        }
 
-                            <strong>
 
-                                ${facility.icon}
+                        map.flyTo({
 
-                                ${facility.name}
+                            center: [
+                                facility.longitude,
+                                facility.latitude
+                            ],
 
-                            </strong>
+                            zoom: 16,
 
-                            <br>
+                            essential: true
 
-                            <small>
+                        });
 
-                                ${facility.type}
 
-                            </small>
+                        if (facility.marker) {
 
-                        </button>
+                            facility.marker.togglePopup();
 
-                    </div>
+                        }
 
-                `;
+                    }
+                );
 
             }
         );
 
-
-        html += `
-
-            </div>
-
-        `;
-
-
-        facilitiesContainer.innerHTML =
-            html;
-
-
-        /* ======================================
-           FACILITY BUTTON EVENTS
-        ====================================== */
-
-        facilitiesContainer
-            .querySelectorAll(
-                ".facility-button"
-            )
-            .forEach(
-                function (button) {
-
-                    button.addEventListener(
-                        "click",
-                        function () {
-
-                            const index =
-                                Number(
-                                    this.dataset.index
-                                );
-
-
-                            const facility =
-                                facilityList[
-                                    index
-                                ];
-
-
-                            if (!facility) {
-
-                                return;
-
-                            }
-
-
-                            map.flyTo({
-
-                                center: [
-
-                                    facility.longitude,
-
-                                    facility.latitude
-
-                                ],
-
-                                zoom:
-                                    16,
-
-                                essential:
-                                    true
-
-                            });
-
-
-                            facility.marker
-                                .togglePopup();
-
-                        }
-                    );
-
-                }
-            );
-
-    }
+}
 
 
     /* ==========================================
        SEARCH ONLINE FACILITIES
     ========================================== */
 
-    async function loadNearbyFacilities(
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371;
 
-        latitude,
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
 
-        longitude
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) *
+        Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
 
-    ) {
-
-        /* ======================================
-           OFFLINE
-        ====================================== */
-
-        if (!navigator.onLine) {
-
-            console.log(
-                "Offline: loading saved facilities."
-            );
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
 
 
-            const loaded =
-                loadSavedFacilities();
+async function loadNearbyFacilities(latitude, longitude) {
 
-
-            if (!loaded) {
-
-                if (
-                    facilitiesContainer
-                ) {
-
-                    facilitiesContainer.innerHTML = `
-
-                        <div class="alert alert-warning">
-
-                            <strong>
-                                Offline Mode
-                            </strong>
-
-                            <br>
-
-                            No previously downloaded
-                            emergency facilities are
-                            available.
-
-                            <br><br>
-
-                            Connect to the internet once
-                            to download nearby facilities.
-
-                        </div>
-
-                    `;
-
-                }
-
-
-                status.textContent =
-                    "Offline: no saved emergency facilities available.";
-
-            }
-
-
-            return;
-
-        }
-
-
-        /* ======================================
-           ONLINE
-        ====================================== */
+    if (!facilityList.length) {
 
         status.textContent =
-            "Finding nearby emergency facilities...";
+            "Emergency facilities are still loading...";
 
+        return;
+    }
 
-        const radius =
-            5000;
+    clearFacilityMarkers();
 
+    nearbyFacilities = facilityList
+        .map(function (facility) {
 
-        const query = `
+            return {
+                ...facility,
 
-            [out:json][timeout:25];
+                distance: calculateDistance(
+                    latitude,
+                    longitude,
+                    Number(facility.latitude),
+                    Number(facility.longitude)
+                )
+            };
 
-            (
+        })
+        .filter(function (facility) {
 
-                nwr["amenity"="hospital"]
-                (around:${radius},${latitude},${longitude});
+            return facility.distance <= 25;
 
-                nwr["amenity"="police"]
-                (around:${radius},${latitude},${longitude});
+        })
+        .sort(function (a, b) {
 
-                nwr["amenity"="fire_station"]
-                (around:${radius},${latitude},${longitude});
+            return a.distance - b.distance;
 
-            );
+        })
+        .slice(0, 20);
 
-            out center tags;
 
-        `;
+    console.log(
+        "Nearby facilities:",
+        nearbyFacilities.length
+    );
 
 
-        const url =
-            "https://overpass-api.de/api/interpreter";
+    nearbyFacilities.forEach(
+        function (facility) {
 
+            const marker =
+                createFacilityMarker(facility);
 
-        try {
+            facility.marker = marker;
 
-            const response =
-                await fetch(
+        }
+    );
 
-                    url,
 
-                    {
+    displayFacilityList(
+        nearbyFacilities
+    );
 
-                        method:
-                            "POST",
 
-                        headers: {
+    if (nearbyFacilities.length > 0) {
 
-                            "Content-Type":
-                                "application/x-www-form-urlencoded"
+        mapStatus.textContent =
+            `${nearbyFacilities.length} nearby emergency facilities found.`;
 
-                        },
+    }
+    else {
 
-                        body:
-                            "data=" +
-                            encodeURIComponent(
-                                query
-                            )
+        mapStatus.textContent =
+            "No emergency facilities found within 25 km.";
 
-                    }
+    }
 
-                );
+}
 
+/* ==========================================
+   DISPLAY USER LOCATION
+========================================== */
 
-            if (!response.ok) {
+function showUserLocation(
+    latitude,
+    longitude,
+    label
+) {
 
-                throw new Error(
-                    "Overpass request failed"
-                );
+    /* ======================================
+       CENTER MAP
+    ====================================== */
 
-            }
+    map.flyTo({
 
+        center: [
+            longitude,
+            latitude
+        ],
 
-            const data =
-                await response.json();
+        zoom: 14,
 
+        essential: true
 
-            clearFacilityMarkers();
+    });
 
 
-            facilityList = [];
+    /* ======================================
+       REMOVE OLD USER MARKER
+    ====================================== */
 
+    if (userMarker) {
 
-            if (
-                facilitiesContainer
-            ) {
+        userMarker.remove();
 
-                facilitiesContainer.innerHTML =
-                    "";
+    }
 
-            }
 
+    /* ======================================
+       CREATE USER MARKER
+    ====================================== */
 
-            data.elements.forEach(
-                function (element) {
+    userMarker =
+        new maplibregl.Marker({
 
-                    let latitude =
-                        element.lat;
+            color: "#D64545"
 
-                    let longitude =
-                        element.lon;
+        })
 
+        .setLngLat([
 
-                    /* ==================================
-                       WAYS / RELATIONS
-                    ================================== */
+            longitude,
 
-                    if (
+            latitude
 
-                        latitude ===
-                            undefined &&
+        ])
 
-                        element.center
+        .setPopup(
 
-                    ) {
+            new maplibregl.Popup()
 
-                        latitude =
-                            element.center.lat;
+                .setHTML(
 
-                        longitude =
-                            element.center.lon;
+                    `
+                    <strong>
+                        📍 ${label}
+                    </strong>
 
-                    }
+                    <br>
 
+                    ${latitude.toFixed(5)},
+                    ${longitude.toFixed(5)}
+                    `
 
-                    if (
+                )
 
-                        latitude ===
-                            undefined ||
+        )
 
-                        longitude ===
-                            undefined
+        .addTo(map);
 
-                    ) {
 
-                        return;
+    /* ======================================
+       FIND NEARBY FACILITIES
+    ====================================== */
 
-                    }
+    loadNearbyFacilities(
+        latitude,
+        longitude
+    );
+}
 
+/* ==========================================
+   OFFLINE-CAPABLE GPS LOCATION
+========================================== */
 
-                    const tags =
-                        element.tags ||
-                        {};
+function locateUser() {
 
+    status.textContent =
+        "📍 Acquiring your GPS location...";
 
-                    const name =
-                        tags.name ||
-                        "Unnamed facility";
+    if (!navigator.geolocation) {
 
+        status.textContent =
+            "GPS location is not supported by this device.";
 
-                    let type =
-                        "Emergency Facility";
+        return;
+    }
 
 
-                    let icon =
-                        "📍";
+    let watchId = null;
+    let locationFound = false;
 
 
-                    if (
-                        tags.amenity ===
-                        "hospital"
-                    ) {
+    /* ==========================================
+       SUCCESS
+    ========================================== */
 
-                        type =
-                            "Hospital";
+    function success(position) {
 
-                        icon =
-                            "🏥";
+        if (locationFound) {
+            return;
+        }
 
-                    }
+        locationFound = true;
 
-                    else if (
-                        tags.amenity ===
-                        "police"
-                    ) {
-
-                        type =
-                            "Police Station";
-
-                        icon =
-                            "🚓";
-
-                    }
-
-                    else if (
-                        tags.amenity ===
-                        "fire_station"
-                    ) {
-
-                        type =
-                            "Fire Station";
-
-                        icon =
-                            "🚒";
-
-                    }
-
-
-                    const facility = {
-
-                        name:
-                            name,
-
-                        type:
-                            type,
-
-                        icon:
-                            icon,
-
-                        latitude:
-                            latitude,
-
-                        longitude:
-                            longitude
-
-                    };
-
-
-                    const marker =
-                        createFacilityMarker(
-                            facility
-                        );
-
-
-                    facilityList.push({
-
-                        name:
-                            name,
-
-                        type:
-                            type,
-
-                        icon:
-                            icon,
-
-                        latitude:
-                            latitude,
-
-                        longitude:
-                            longitude,
-
-                        marker:
-                            marker
-
-                    });
-
-                }
-            );
-
-
-            /* ======================================
-               SAVE FOR OFFLINE USE
-            ====================================== */
-
-            saveFacilitiesOffline(
-                facilityList
-            );
-
-
-            /* ======================================
-               DISPLAY
-            ====================================== */
-
-            if (
-                facilityList.length ===
-                0
-            ) {
-
-                if (
-                    facilitiesContainer
-                ) {
-
-                    facilitiesContainer.innerHTML = `
-
-                        <div class="alert alert-warning">
-
-                            No mapped emergency facilities
-                            were found within 5 km.
-
-                        </div>
-
-                    `;
-
-                }
-
-
-                status.textContent =
-                    "No mapped emergency facilities found within 5 km.";
-
-                return;
-
-            }
-
-
-            displayFacilityList();
-
-
-            status.textContent =
-
-                facilityList.length +
-
-                " emergency facilities found within 5 km and saved for offline use.";
-
+        if (watchId !== null) {
+            navigator.geolocation.clearWatch(watchId);
         }
 
 
-        catch (error) {
+        const latitude =
+            position.coords.latitude;
 
-            console.error(
-                "Facility search error:",
-                error
-            );
-
-
-            /* ==================================
-               FALL BACK TO SAVED DATA
-            ================================== */
-
-            const loaded =
-                loadSavedFacilities();
+        const longitude =
+            position.coords.longitude;
 
 
-            if (!loaded) {
-
-                if (
-                    facilitiesContainer
-                ) {
-
-                    facilitiesContainer.innerHTML = `
-
-                        <div class="alert alert-info">
-
-                            <strong>
-                                Nearby facilities unavailable
-                            </strong>
-
-                            <br>
-
-                            Connect to the internet
-                            to download emergency
-                            facility information.
-
-                        </div>
-
-                    `;
-
-                }
+        const accuracy =
+            position.coords.accuracy;
 
 
-                status.textContent =
-                    "Facility search unavailable.";
+        console.log(
+            "GPS LOCATION:",
+            latitude,
+            longitude
+        );
 
-            }
+        console.log(
+            "GPS ACCURACY:",
+            accuracy,
+            "meters"
+        );
 
-        }
 
+        /* ======================================
+           SAVE LOCATION
+        ====================================== */
+
+        localStorage.setItem(
+            "divya_last_location",
+            JSON.stringify({
+
+                latitude: latitude,
+
+                longitude: longitude,
+
+                accuracy: accuracy,
+
+                timestamp: Date.now()
+
+            })
+        );
+
+
+        /* ======================================
+           SHOW LOCATION
+        ====================================== */
+
+        showUserLocation(
+            latitude,
+            longitude,
+            "Your Current GPS Location"
+        );
+
+
+        status.textContent =
+            "📍 Location found. Searching nearby emergency facilities...";
     }
 
 
     /* ==========================================
-       LOCATION
+       ERROR
     ========================================== */
 
-    function locateUser() {
+    function error(err) {
 
-        status.textContent =
-            "Requesting your location...";
+        console.warn(
+            "GPS attempt:",
+            err.code,
+            err.message
+        );
 
 
-        if (
-            !navigator.geolocation
-        ) {
+        /*
+           Code 1 = permission denied
+
+           Do NOT use fallback if the user
+           explicitly denied location.
+        */
+
+        if (err.code === 1) {
+
+            if (watchId !== null) {
+                navigator.geolocation.clearWatch(watchId);
+            }
 
             status.textContent =
-                "Geolocation is not supported by this browser.";
+                "Location permission denied. Please allow GPS/location access.";
 
             return;
-
         }
 
 
-        navigator.geolocation.getCurrentPosition(
+        /*
+           Codes 2 and 3 mean the device
+           could not obtain a fresh position yet.
 
-            function (position) {
+           watchPosition() will continue trying.
+        */
 
-                const latitude =
-                    position.coords.latitude;
+        status.textContent =
+            "📍 Searching for GPS signal...";
 
-                const longitude =
-                    position.coords.longitude;
+
+        console.log(
+            "Waiting for GPS signal..."
+        );
+    }
+
+
+    /* ==========================================
+       START GPS WATCH
+    ========================================== */
+
+    watchId =
+        navigator.geolocation.watchPosition(
+            success,
+            error,
+            {
+
+                enableHighAccuracy: true,
+
+                timeout: 60000,
+
+                maximumAge: 0
+
+            }
+        );
+
+
+    /* ==========================================
+       STOP AFTER 60 SECONDS
+    ========================================== */
+
+    setTimeout(function () {
+
+        if (locationFound) {
+            return;
+        }
+
+
+        if (watchId !== null) {
+
+            navigator.geolocation.clearWatch(
+                watchId
+            );
+
+            watchId = null;
+        }
+
+
+        console.warn(
+            "GPS timeout: no fresh location obtained."
+        );
+
+
+        /*
+           LAST KNOWN LOCATION FALLBACK
+        */
+
+        const savedLocation =
+            localStorage.getItem(
+                "divya_last_location"
+            );
+
+
+        if (savedLocation) {
+
+            try {
+
+                const location =
+                    JSON.parse(
+                        savedLocation
+                    );
 
 
                 console.log(
-                    "USER LOCATION:",
-                    latitude,
-                    longitude
+                    "Using last known location:",
+                    location.latitude,
+                    location.longitude
                 );
 
 
-                /* ==================================
-                   SAVE LOCATION
-                ================================== */
-
-                localStorage.setItem(
-
-                    "divya_last_location",
-
-                    JSON.stringify({
-
-                        latitude:
-                            latitude,
-
-                        longitude:
-                            longitude,
-
-                        timestamp:
-                            Date.now()
-
-                    })
-
+                showUserLocation(
+                    location.latitude,
+                    location.longitude,
+                    "Last Known Location"
                 );
 
 
-                /* ==================================
-                   CENTER MAP
-                ================================== */
+                status.textContent =
+                    "⚠️ GPS signal unavailable. Using your last known location.";
 
-                map.flyTo({
-
-                    center: [
-
-                        longitude,
-
-                        latitude
-
-                    ],
-
-                    zoom:
-                        14,
-
-                    essential:
-                        true
-
-                });
-
-
-                /* ==================================
-                   REMOVE OLD MARKER
-                ================================== */
-
-                if (
-                    userMarker
-                ) {
-
-                    userMarker.remove();
-
-                }
-
-
-                /* ==================================
-                   USER MARKER
-                ================================== */
-
-                userMarker =
-
-                    new maplibregl.Marker({
-
-                        color:
-                            "#D64545"
-
-                    })
-
-                    .setLngLat([
-
-                        longitude,
-
-                        latitude
-
-                    ])
-
-                    .setPopup(
-
-                        new maplibregl.Popup()
-                            .setHTML(
-
-                                `
-
-                                <strong>
-                                    📍 Your Location
-                                </strong>
-
-                                <br>
-
-                                ${latitude.toFixed(5)},
-                                ${longitude.toFixed(5)}
-
-                                `
-
-                            )
-
-                    )
-
-                    .addTo(map);
-
-
-                /* ==================================
-                   LOAD FACILITIES
-                ================================== */
-
-                loadNearbyFacilities(
-
-                    latitude,
-
-                    longitude
-
-                );
-
-            },
-
-
-            function (error) {
+            }
+            catch (e) {
 
                 console.error(
-                    "Location error:",
-                    error
+                    "Saved location error:",
+                    e
                 );
 
-
-                if (
-                    error.code ===
-                    1
-                ) {
-
-                    status.textContent =
-                        "Location permission was denied. Please allow location access.";
-
-                }
-
-                else if (
-                    error.code ===
-                    2
-                ) {
-
-                    status.textContent =
-                        "Your location could not be determined.";
-
-                }
-
-                else {
-
-                    status.textContent =
-                        "Unable to obtain your location.";
-
-                }
-
-            },
-
-
-            {
-
-                enableHighAccuracy:
-                    true,
-
-                timeout:
-                    10000,
-
-                maximumAge:
-                    60000
+                status.textContent =
+                    "Unable to obtain your GPS location.";
 
             }
 
-        );
+        }
+        else {
 
-    }
+            status.textContent =
+                "⚠️ GPS signal unavailable. Move to an open area and try again.";
+
+        }
+
+    }, 60000);
+}
 
 
     /* ==========================================
@@ -2538,7 +2245,7 @@ async function loadPreloadedUPFacilities() {
                     .addTo(map);
 
 
-                loadSavedFacilities();
+            
 
 
                 status.textContent =
@@ -3022,6 +2729,17 @@ EMERGENCY NUMBERS
 
 </script>
 
+<script>
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/service-worker.js")
+        .then(() => {
+            console.log("DIVYA AI offline mode ready");
+        })
+        .catch(error => {
+            console.error("Service Worker error:", error);
+        });
+}
+</script>
 
 </body>
 

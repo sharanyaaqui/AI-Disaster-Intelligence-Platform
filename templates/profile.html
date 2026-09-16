@@ -67,11 +67,14 @@ href="{{ url_for('static', filename='css/style.css') }}">
             <h3>My Profile</h3>
 
             <button
-type="button"
-class="btn btn-warning">
-                <i class="bi bi-pencil-square"></i>
-                Edit Profile
-            </button>
+    type="button"
+    class="btn btn-warning"
+    id="editProfileBtn">
+
+    <i class="bi bi-pencil-square"></i>
+    Edit Profile
+
+</button>
 
         </nav>
 
@@ -89,7 +92,7 @@ class="btn btn-warning">
                              class="profile-avatar mb-3"
                              alt="Profile">
 
-                        <h3>Sharanya Pandey</h3>
+                        <h3>{{ user.full_name }}</h3>
 
                         <p class="text-muted">
                             Registered Citizen
@@ -99,7 +102,7 @@ class="btn btn-warning">
 
                         <div class="text-start">
 
-                            <p><i class="bi bi-envelope-fill text-warning"></i> sharanya@email.com</p>
+                            <p><i class="bi bi-envelope-fill text-warning"></i> {{ user.email }}</p>
 
                             <p><i class="bi bi-telephone-fill text-warning"></i> +91 XXXXX XXXXX</p>
 
@@ -119,35 +122,24 @@ class="btn btn-warning">
 
                         <h4 class="mb-4">Personal Information</h4>
 
-                        <form action="/profile" method="POST">
+                        <form action="{{ url_for('profile') }}" method="POST">
 
                             <div class="row">
 
                                 <div class="col-md-6 mb-3">
 
-                                    <label>First Name</label>
+                                    <label>Full Name</label>
 
-                                    <input
-                                    type="text"
-                                    class="form-control"
-                                    name="first_name"
-                                    value="Sharanya"
-                                    required>
-
+                                   <input
+                                     type="text"
+                                     class="form-control"
+                                     name="full_name"
+                                     value="{{ user.full_name }}"
+                                     disabled
+                                     required>
                                 </div>
 
-                                <div class="col-md-6 mb-3">
-
-                                    <label>Last Name</label>
-
-                                    <input
-type="text"
-class="form-control"
-name="last_name"
-value="Pandey"
-required>
-
-                                </div>
+                               
 
                             </div>
 
@@ -159,7 +151,8 @@ required>
 type="email"
 class="form-control"
 name="email"
-value="sharanya@email.com"
+value="{{ user.email }}"
+disabled
 required>
 
                             </div>
@@ -177,21 +170,55 @@ required>
 
                             </div>
 
-                            <div class="mb-3">
+                           <div class="mb-3">
 
-                                <label>Preferred Language</label>
+    <label>Full Name</label>
 
-                                <select
-class="form-select"
-name="language">
+    <input
+        type="text"
+        class="form-control"
+        name="full_name"
+        value="{{ user.full_name }}"
+        disabled
+        required>
 
-                                    <option>English</option>
+</div>
 
-                                    <option>हिन्दी</option>
+<div class="mb-3">
 
-                                </select>
+    <label>Email</label>
 
-                            </div>
+    <input
+        type="email"
+        class="form-control"
+        name="email"
+        value="{{ user.email }}"
+        disabled
+        required>
+
+</div>
+<div class="mb-3">
+
+    <label>Preferred Language</label>
+
+    <select
+        class="form-select"
+        id="languageSelect"
+        name="language">
+
+        <option value="en"
+            {% if user.preferred_language == "en" %}selected{% endif %}>
+            English
+        </option>
+
+        <option value="hi"
+            {% if user.preferred_language == "hi" %}selected{% endif %}>
+            हिन्दी
+        </option>
+
+    </select>
+
+</div>
 
                             <div class="mb-3">
 
@@ -227,156 +254,246 @@ class="btn btn-warning">
 
             <div class="dashboard-card mt-4">
 
-                <h4 class="mb-4">
+    <h4 class="mb-4">
 
-                    <i class="bi bi-person-lines-fill"></i>
+        <i class="bi bi-person-lines-fill"></i>
 
-                    Emergency Contacts
+        Emergency Contacts
 
-                </h4>
+    </h4>
 
-                <div class="row">
 
-                    <div class="col-md-6">
+    {% for contact in user.emergency_contacts %}
 
-                        <input
-type="text"
-class="form-control mb-3"
-name="emergency_contact_name"
-placeholder="Contact Name">
+    <div class="row align-items-center mb-3">
 
-                    </div>
+        <div class="col-md-5">
 
-                    <div class="col-md-6">
+            <input
+                type="text"
+                class="form-control"
+                value="{{ contact.name }}"
+                disabled>
 
-                       <input
-type="tel"
-class="form-control mb-3"
-name="emergency_contact_phone"
-placeholder="Phone Number">
+        </div>
 
-                    </div>
+        <div class="col-md-5">
 
-                </div>
+            <input
+                type="tel"
+                class="form-control"
+                value="{{ contact.phone }}"
+                disabled>
 
-                <button
-type="button"
-class="btn btn-success">
+        </div>
 
-                    <i class="bi bi-plus-circle"></i>
+        <div class="col-md-2">
 
-                    Add Contact
+            <a
+                href="{{ url_for('delete_emergency_contact', contact_id=contact.id) }}"
+                class="btn btn-danger">
 
-                </button>
+                <i class="bi bi-trash"></i>
 
-            </div>
-
-            <!-- Vulnerability Profile -->
-
-            <div class="dashboard-card mt-4 mb-5">
-
-                <h4 class="mb-4">
-
-                    <i class="bi bi-heart-pulse"></i>
-
-                    Vulnerability Profile
-
-                </h4>
-
-                <div class="row">
-
-                    <div class="col-md-3">
-
-                        <div class="form-check">
-
-                            <input
-class="form-check-input"
-type="checkbox"
-name="vulnerability"
-value="elderly">
-
-                            <label class="form-check-label">
-
-                                Elderly
-
-                            </label>
-
-                        </div>
-
-                    </div>
-
-                    <div class="col-md-3">
-
-                        <div class="form-check">
-
-                            <input
-class="form-check-input"
-type="checkbox"
-name="vulnerability"
-value="child">
-
-                            <label class="form-check-label">
-
-                                Child
-
-                            </label>
-
-                        </div>
-
-                    </div>
-
-                    <div class="col-md-3">
-
-                        <div class="form-check">
-
-                            <input
-class="form-check-input"
-type="checkbox"
-name="vulnerability"
-value="disability">
-
-                            <label class="form-check-label">
-
-                                Disability
-
-                            </label>
-
-                        </div>
-
-                    </div>
-
-                    <div class="col-md-3">
-
-                        <div class="form-check">
-
-                            <input
-class="form-check-input"
-type="checkbox"
-name="vulnerability"
-value="chronic_illness">
-
-                            <label class="form-check-label">
-
-                                Chronic Illness
-
-                            </label>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
+            </a>
 
         </div>
 
     </div>
 
+    {% endfor %}
+
+
+    <form
+        action="{{ url_for('add_emergency_contact') }}"
+        method="POST">
+
+        <div class="row">
+
+            <div class="col-md-5">
+
+                <input
+                    type="text"
+                    class="form-control mb-3"
+                    name="emergency_contact_name"
+                    placeholder="Contact Name"
+                    required>
+
+            </div>
+
+            <div class="col-md-5">
+
+                <input
+                    type="tel"
+                    class="form-control mb-3"
+                    name="emergency_contact_phone"
+                    placeholder="Phone Number"
+                    required>
+
+            </div>
+
+            <div class="col-md-2">
+
+                <button
+                    type="submit"
+                    class="btn btn-success">
+
+                    <i class="bi bi-plus-circle"></i>
+
+                    Add
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+            <!-- Vulnerability Profile -->
+
+<div class="dashboard-card mt-4 mb-5">
+
+    <h4 class="mb-4">
+        <i class="bi bi-heart-pulse"></i>
+        Vulnerability Profile
+    </h4>
+
+    <form action="{{ url_for('update_vulnerabilities') }}" method="POST">
+
+        <div class="row">
+
+            <div class="col-md-3">
+                <div class="form-check">
+
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        name="vulnerability"
+                        value="elderly"
+                        {% if "elderly" in vulnerabilities %}checked{% endif %}
+                    >
+
+                    <label class="form-check-label">
+                        Elderly
+                    </label>
+
+                </div>
+            </div>
+
+
+            <div class="col-md-3">
+                <div class="form-check">
+
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        name="vulnerability"
+                        value="child"
+                        {% if "child" in vulnerabilities %}checked{% endif %}
+                    >
+
+                    <label class="form-check-label">
+                        Child
+                    </label>
+
+                </div>
+            </div>
+
+
+            <div class="col-md-3">
+                <div class="form-check">
+
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        name="vulnerability"
+                        value="disability"
+                        {% if "disability" in vulnerabilities %}checked{% endif %}
+                    >
+
+                    <label class="form-check-label">
+                        Disability
+                    </label>
+
+                </div>
+            </div>
+
+
+            <div class="col-md-3">
+                <div class="form-check">
+
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        name="vulnerability"
+                        value="chronic_illness"
+                        {% if "chronic_illness" in vulnerabilities %}checked{% endif %}
+                    >
+
+                    <label class="form-check-label">
+                        Chronic Illness
+                    </label>
+
+                </div>
+            </div>
+
+        </div>
+
+        <button
+            type="submit"
+            class="btn btn-warning mt-3">
+
+            <i class="bi bi-save"></i>
+            Save Vulnerability Profile
+
+        </button>
+
+    </form>
+
 </div>
 
 <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
 
+    const editButton = document.getElementById("editProfileBtn");
+    const profileFields = document.querySelectorAll(".profile-field");
+
+    let editing = false;
+
+    editButton.addEventListener("click", function () {
+
+        editing = !editing;
+
+        profileFields.forEach(function (field) {
+            field.disabled = !editing;
+        });
+
+        if (editing) {
+
+            editButton.innerHTML =
+                '<i class="bi bi-x-circle"></i> Cancel Edit';
+
+            editButton.classList.remove("btn-warning");
+            editButton.classList.add("btn-secondary");
+
+        } else {
+
+            editButton.innerHTML =
+                '<i class="bi bi-pencil-square"></i> Edit Profile';
+
+            editButton.classList.remove("btn-secondary");
+            editButton.classList.add("btn-warning");
+
+        }
+
+    });
+
+});
+</script>
 </body>
 
 </html>

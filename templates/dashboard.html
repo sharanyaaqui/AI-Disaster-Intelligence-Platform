@@ -54,7 +54,7 @@ DIVYA <span class="text-warning">AI</span>
 
 <i class="bi bi-grid-fill"></i>
 
-Dashboard
+{{ t("dashboard") }}
 
 </a>
 
@@ -1583,64 +1583,235 @@ async function loadWeather() {
 }
 
 loadWeather();
+// =======================================
+// LIVE DISASTER MAP
+// =======================================
+
 async function loadDisasterMap() {
 
+    const mapContainer = document.getElementById("disasterMap");
+
+    // If this is not the dashboard page, do nothing
+    if (!mapContainer) {
+        return;
+    }
+
+    // Create map
     const map = L.map("disasterMap").setView(
         [26.8467, 80.9462],
         10
     );
 
+    // OpenStreetMap
     L.tileLayer(
         "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
         {
-            attribution:
-                '&copy; OpenStreetMap contributors'
+            attribution: "&copy; OpenStreetMap contributors"
         }
     ).addTo(map);
 
-    try {
 
-        const response = await fetch("/reports/recent");
+    // =======================================
+    // CURRENT USER LOCATION
+    // =======================================
 
-        const data = await response.json();
+    let userMarker = null;
+    let accuracyCircle = null;
+    let firstLocationFound = false;
 
-        if (!data.success || !data.reports.length) {
-            return;
+
+    function updateUserLocation(position) {
+
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+        const accuracy = position.coords.accuracy;
+
+
+        console.log(
+            "Current Location:",
+            latitude,
+            longitude
+        );
+
+
+        // Create user marker first time
+        if (!userMarker) {
+
+            userMarker = L.marker(
+                [latitude, longitude]
+            ).addTo(map);
+
+            userMarker.bindPopup(
+                "<strong>📍 Your Current Location</strong>"
+            );
+
+
+            // Accuracy circle
+            accuracyCircle = L.circle(
+                [latitude, longitude],
+                {
+                    radius: accuracy
+                }
+            ).addTo(map);
+
         }
 
-        data.reports.forEach(function(report) {
+        // Update existing marker
+        else {
+
+            userMarker.setLatLng([
+                latitude,
+                longitude
+            ]);
+
+            accuracyCircle.setLatLng([
+                latitude,
+                longitude
+            ]);
+
+            accuracyCircle.setRadius(
+                accuracy
+            );
+        }
+
+
+        // Center map on user's location
+        if (!firstLocationFound) {
+
+            map.setView(
+                [latitude, longitude],
+                15
+            );
+
+            firstLocationFound = true;
+
+            userMarker.openPopup();
+        }
+    }
+
+
+    // =======================================
+    // LOCATION ERROR
+    // =======================================
+
+    function locationError(error) {
+
+        console.error(
+            "Location Error:",
+            error
+        );
+
+        if (error.code === 1) {
+
+            alert(
+                "Location permission was denied. " +
+                "Please allow location access in your browser."
+            );
+
+        } else if (error.code === 2) {
+
+            alert(
+                "Your current location could not be determined."
+            );
+
+        } else if (error.code === 3) {
+
+            alert(
+                "Location request timed out."
+            );
+        }
+    }
+
+
+    // =======================================
+    // GET CURRENT LOCATION
+    // =======================================
+
+    if ("geolocation" in navigator) {
+
+        navigator.geolocation.watchPosition(
+            updateUserLocation,
+            locationError,
+            {
+                enableHighAccuracy: true,
+                maximumAge: 5000,
+                timeout: 10000
+            }
+        );
+
+    } else {
+
+        alert(
+            "Geolocation is not supported by this browser."
+        );
+    }
+
+
+    // =======================================
+    // LOAD DISASTER REPORTS
+    // =======================================
+
+    async function loadReports() {
+
+        try {
+
+            const response =
+                await fetch("/reports/recent");
+
+            const data =
+                await response.json();
+
 
             if (
-                report.latitude === null ||
-                report.longitude === null
+                !data.success ||
+                !data.reports.length
             ) {
                 return;
             }
 
-            const marker = L.marker([
-                report.latitude,
-                report.longitude
-            ]).addTo(map);
 
-            marker.bindPopup(`
-                <strong>Report #${report.id}</strong><br>
-                Disaster: ${report.disaster_type}<br>
-                Status: ${report.status}<br>
-                Reported by: ${report.reported_by}
-            `);
+            data.reports.forEach(function(report) {
 
-        });
+                if (
+                    report.latitude === null ||
+                    report.longitude === null
+                ) {
+                    return;
+                }
 
-    } catch (error) {
 
-        console.error(
-            "Disaster map error:",
-            error
-        );
+                const marker = L.marker([
+                    report.latitude,
+                    report.longitude
+                ]).addTo(map);
 
+
+                marker.bindPopup(`
+                    <strong>Report #${report.id}</strong><br>
+                    Disaster: ${report.disaster_type}<br>
+                    Status: ${report.status}<br>
+                    Reported by: ${report.reported_by}
+                `);
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                "Disaster map error:",
+                error
+            );
+        }
     }
+
+
+    // Load disaster reports
+    await loadReports();
+
 }
 
+
+// Start map
 loadDisasterMap();
 
 async function loadRecentAlerts() {
